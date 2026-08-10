@@ -130,3 +130,33 @@ body {
 .dashboard-page .table td {
     vertical-align: middle;
 }
+
+
+/* =========================
+   PRODUCTS PAGE
+========================= */
+
+.products-page .table th {
+    white-space: nowrap;
+}
+
+.products-page .table td {
+    vertical-align: middle;
+}
+
+.product-action-btn {
+    min-width: 36px;
+}
+
+.modal-content {
+    border: none;
+    border-radius: 12px;
+}
+
+.modal-header {
+    border-bottom: 1px solid #eeeeee;
+}
+
+.modal-footer {
+    border-top: 1px solid #eeeeee;
+}

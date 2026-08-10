@@ -157,3 +157,60 @@ if (registerForm) {
     });
 
 }
+
+
+
+
+// =========================
+// PRODUCT SEARCH
+// =========================
+
+const productSearch = document.getElementById("productSearch");
+
+if (productSearch) {
+
+    productSearch.addEventListener("input", function () {
+
+        const searchValue = productSearch.value
+            .toLowerCase()
+            .trim();
+
+        const rows = document.querySelectorAll(
+            "#productsTable tbody tr"
+        );
+
+        let visibleProducts = 0;
+
+        rows.forEach(function (row) {
+
+            const productName = row
+                .querySelector("td:nth-child(2)")
+                .textContent
+                .toLowerCase();
+
+            if (productName.includes(searchValue)) {
+
+                row.style.display = "";
+                visibleProducts++;
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+        const productCount =
+            document.getElementById("productCount");
+
+        if (productCount) {
+
+            productCount.textContent =
+                `${visibleProducts} Products`;
+
+        }
+
+    });
+
+}
