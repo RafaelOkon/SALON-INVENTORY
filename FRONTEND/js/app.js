@@ -59,6 +59,8 @@ setupPasswordToggle(
 );
 
 
+
+
 // =========================
 // REGISTRATION VALIDATION
 // =========================
@@ -161,6 +163,8 @@ if (registerForm) {
 
 
 
+
+
 // =========================
 // PRODUCT SEARCH
 // =========================
@@ -214,3 +218,205 @@ if (productSearch) {
     });
 
 }
+
+
+// =========================
+// PRODUCT FILTER RESET
+// =========================
+
+const resetFilters = document.getElementById("resetFilters");
+
+if (resetFilters) {
+
+    resetFilters.addEventListener("click", function () {
+
+        const searchInput =
+            document.getElementById("productSearch");
+
+        const categoryFilter =
+            document.getElementById("categoryFilter");
+
+        const stockFilter =
+            document.getElementById("stockFilter");
+
+        if (searchInput) {
+            searchInput.value = "";
+        }
+
+        if (categoryFilter) {
+            categoryFilter.value = "";
+        }
+
+        if (stockFilter) {
+            stockFilter.value = "";
+        }
+
+        const rows = document.querySelectorAll(
+            "#productsTable tbody tr"
+        );
+
+        rows.forEach(function (row) {
+            row.style.display = "";
+        });
+
+        const productCount =
+            document.getElementById("productCount");
+
+        if (productCount) {
+            productCount.textContent = `${rows.length} Products`;
+        }
+
+    });
+
+}
+
+// =========================
+// CATEGORY SEARCH
+// =========================
+
+const categorySearch =
+    document.getElementById("categorySearch");
+
+if (categorySearch) {
+
+    categorySearch.addEventListener("input", function () {
+
+        const searchValue =
+            categorySearch.value.toLowerCase().trim();
+
+        const rows =
+            document.querySelectorAll(
+                "#categoriesTable tbody tr"
+            );
+
+        let visibleCategories = 0;
+
+        rows.forEach(function (row) {
+
+            const categoryName =
+                row
+                    .querySelector("td:nth-child(2)")
+                    .textContent
+                    .toLowerCase();
+
+            if (categoryName.includes(searchValue)) {
+
+                row.style.display = "";
+
+                visibleCategories++;
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+
+        const categoryCount =
+            document.getElementById("categoryCount");
+
+        if (categoryCount) {
+
+            categoryCount.textContent =
+                `${visibleCategories} Categories`;
+
+        }
+
+    });
+
+}
+
+
+// =========================
+// CATEGORY SEARCH RESET
+// =========================
+
+const resetCategorySearch =
+    document.getElementById("resetCategorySearch");
+
+if (resetCategorySearch) {
+
+    resetCategorySearch.addEventListener("click", function () {
+
+        const searchInput =
+            document.getElementById("categorySearch");
+
+        if (searchInput) {
+            searchInput.value = "";
+        }
+
+
+        const rows =
+            document.querySelectorAll(
+                "#categoriesTable tbody tr"
+            );
+
+
+        rows.forEach(function (row) {
+
+            row.style.display = "";
+
+        });
+
+
+        const categoryCount =
+            document.getElementById("categoryCount");
+
+        if (categoryCount) {
+
+            categoryCount.textContent =
+                `${rows.length} Categories`;
+
+        }
+
+    });
+
+}
+
+
+
+// =========================
+// CATEGORY FORM VALIDATION
+// =========================
+
+const categoryForm =
+    document.getElementById("categoryForm");
+
+if (categoryForm) {
+
+    categoryForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+
+        const categoryName =
+            document.getElementById("categoryName");
+
+        const categoryDescription =
+            document.getElementById("categoryDescription");
+
+
+        if (categoryName.value.trim().length < 2) {
+
+            categoryName.classList.add("is-invalid");
+
+            return;
+
+        }
+
+
+        categoryName.classList.remove("is-invalid");
+        categoryName.classList.add("is-valid");
+
+
+        alert(
+            "Category form is valid. Backend connection will be added later."
+        );
+
+    });
+
+}
+
+

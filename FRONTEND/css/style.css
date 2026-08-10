@@ -160,3 +160,24 @@ body {
 .modal-footer {
     border-top: 1px solid #eeeeee;
 }
+
+
+/* =========================
+   CATEGORIES PAGE
+========================= */
+
+.categories-page .table th {
+    white-space: nowrap;
+}
+
+.categories-page .table td {
+    vertical-align: middle;
+}
+
+.categories-page .table td:nth-child(3) {
+    min-width: 250px;
+}
+
+.categories-page .badge {
+    font-weight: 500;
+}
