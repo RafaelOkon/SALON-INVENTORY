@@ -1,5 +1,67 @@
+/* =========================
+   GLOBAL STYLES
+========================= */
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
+    background-color: #ffffff;
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.navbar-brand {
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================
+   HERO SECTION
+========================= */
+
+.hero-section {
+    background-color: #ffffff;
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.hero-icon {
+    font-size: 180px;
+    opacity: 0.9;
+}
+
+
+/* =========================
+   FEATURE CARDS
+========================= */
+
+.feature-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+
+.feature-icon {
+    font-size: 45px;
+}
+
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 768px) {
+
+    .hero-icon {
+        font-size: 120px;
+    }
+
 }
