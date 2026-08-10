@@ -94,3 +94,39 @@ body {
 .login-page a:hover {
     opacity: 0.75;
 }
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.dashboard-page {
+    background-color: #f8f9fa;
+}
+
+.dashboard-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-3px);
+}
+
+.dashboard-icon {
+    font-size: 32px;
+}
+
+.dashboard-page .card {
+    border-radius: 10px;
+}
+
+.dashboard-page .card-header {
+    border-bottom: 1px solid #eeeeee;
+}
+
+.dashboard-page .table th {
+    white-space: nowrap;
+}
+
+.dashboard-page .table td {
+    vertical-align: middle;
+}
