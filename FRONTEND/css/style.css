@@ -65,3 +65,32 @@ body {
     }
 
 }
+/* =========================
+   LOGIN PAGE
+========================= */
+
+.login-page {
+    background-color: #f8f9fa;
+}
+
+.login-icon {
+    font-size: 55px;
+}
+
+.login-page .card {
+    border-radius: 12px;
+}
+
+.login-page .form-control,
+.login-page .input-group-text,
+.login-page .btn {
+    min-height: 45px;
+}
+
+.login-page a {
+    transition: opacity 0.2s ease;
+}
+
+.login-page a:hover {
+    opacity: 0.75;
+}
