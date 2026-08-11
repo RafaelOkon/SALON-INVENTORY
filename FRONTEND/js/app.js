@@ -420,3 +420,283 @@ if (categoryForm) {
 }
 
 
+// =========================
+// SUPPLIER SEARCH
+// =========================
+
+const supplierSearch =
+    document.getElementById("supplierSearch");
+
+if (supplierSearch) {
+
+    supplierSearch.addEventListener("input", function () {
+
+        filterSuppliers();
+
+    });
+
+}
+
+
+// =========================
+// SUPPLIER FILTER FUNCTION
+// =========================
+
+function filterSuppliers() {
+
+    const searchInput =
+        document.getElementById("supplierSearch");
+
+    const statusFilter =
+        document.getElementById("supplierStatusFilter");
+
+    const rows =
+        document.querySelectorAll(
+            "#suppliersTable tbody tr"
+        );
+
+    const searchValue =
+        searchInput
+            ? searchInput.value.toLowerCase().trim()
+            : "";
+
+    const selectedStatus =
+        statusFilter
+            ? statusFilter.value
+            : "";
+
+    let visibleSuppliers = 0;
+
+
+    rows.forEach(function (row) {
+
+        const supplierName =
+            row
+                .querySelector("td:nth-child(2)")
+                .textContent
+                .toLowerCase();
+
+
+        const statusText =
+            row
+                .querySelector("td:nth-child(7)")
+                .textContent
+                .toLowerCase()
+                .trim();
+
+
+        const matchesSearch =
+            supplierName.includes(searchValue);
+
+
+        let matchesStatus = true;
+
+
+        if (selectedStatus === "active") {
+
+            matchesStatus =
+                statusText === "active";
+
+        }
+
+
+        if (selectedStatus === "inactive") {
+
+            matchesStatus =
+                statusText === "inactive";
+
+        }
+
+
+        if (matchesSearch && matchesStatus) {
+
+            row.style.display = "";
+
+            visibleSuppliers++;
+
+        } else {
+
+            row.style.display = "none";
+
+        }
+
+    });
+
+
+    const supplierCount =
+        document.getElementById("supplierCount");
+
+
+    if (supplierCount) {
+
+        supplierCount.textContent =
+            `${visibleSuppliers} Suppliers`;
+
+    }
+
+}
+
+
+
+const supplierStatusFilter =
+    document.getElementById("supplierStatusFilter");
+
+if (supplierStatusFilter) {
+
+    supplierStatusFilter.addEventListener("change", function () {
+
+        filterSuppliers();
+
+    });
+
+}
+
+
+// =========================
+// SUPPLIER FILTER RESET
+// =========================
+
+const resetSupplierFilters =
+    document.getElementById("resetSupplierFilters");
+
+if (resetSupplierFilters) {
+
+    resetSupplierFilters.addEventListener("click", function () {
+
+        const searchInput =
+            document.getElementById("supplierSearch");
+
+        const statusFilter =
+            document.getElementById("supplierStatusFilter");
+
+
+        if (searchInput) {
+            searchInput.value = "";
+        }
+
+
+        if (statusFilter) {
+            statusFilter.value = "";
+        }
+
+
+        filterSuppliers();
+
+    });
+
+}
+
+
+// =========================
+// SUPPLIER FORM VALIDATION
+// =========================
+
+const supplierForm =
+    document.getElementById("supplierForm");
+
+if (supplierForm) {
+
+    supplierForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+
+        const supplierName =
+            document.getElementById("supplierName");
+
+        const contactPerson =
+            document.getElementById("contactPerson");
+
+        const supplierPhone =
+            document.getElementById("supplierPhone");
+
+        const supplierEmail =
+            document.getElementById("supplierEmail");
+
+
+        let isValid = true;
+
+
+        // Supplier name
+
+        if (supplierName.value.trim().length < 2) {
+
+            supplierName.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            supplierName.classList.remove("is-invalid");
+            supplierName.classList.add("is-valid");
+
+        }
+
+
+        // Contact person
+
+        if (contactPerson.value.trim().length < 2) {
+
+            contactPerson.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            contactPerson.classList.remove("is-invalid");
+            contactPerson.classList.add("is-valid");
+
+        }
+
+
+        // Phone
+
+        if (!supplierPhone.validity.valid) {
+
+            supplierPhone.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            supplierPhone.classList.remove("is-invalid");
+            supplierPhone.classList.add("is-valid");
+
+        }
+
+
+        // Email
+
+        if (
+            supplierEmail.value.trim() !== "" &&
+            !supplierEmail.validity.valid
+        ) {
+
+            supplierEmail.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            supplierEmail.classList.remove("is-invalid");
+
+            if (supplierEmail.value.trim() !== "") {
+                supplierEmail.classList.add("is-valid");
+            }
+
+        }
+
+
+        if (!isValid) {
+            return;
+        }
+
+
+        alert(
+            "Supplier form is valid. Backend connection will be added later."
+        );
+
+    });
+
+}
+

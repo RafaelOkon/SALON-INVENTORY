@@ -181,3 +181,24 @@ body {
 .categories-page .badge {
     font-weight: 500;
 }
+
+/* =========================
+   SUPPLIERS PAGE
+========================= */
+
+.suppliers-page .table th {
+    white-space: nowrap;
+}
+
+.suppliers-page .table td {
+    vertical-align: middle;
+}
+
+.suppliers-page .table td:nth-child(5) {
+    min-width: 180px;
+}
+
+.suppliers-page .table td:nth-child(6) {
+    text-align: center;
+}
+
