@@ -1065,3 +1065,213 @@ if (stockOutForm) {
 }
 
 
+// =========================
+// FRONTEND AUTHENTICATION
+// =========================
+
+const currentPage = window.location.pathname;
+
+
+// Pages that require authentication
+const protectedPages = [
+    "dashboard.html",
+    "products.html",
+    "categories.html",
+    "suppliers.html",
+    "stock.html"
+];
+
+
+// Get the current filename
+const pageName =
+    currentPage.split("/").pop();
+
+
+// Check whether the current page requires login
+const isProtectedPage =
+    protectedPages.includes(pageName);
+
+
+// Check login state
+const isLoggedIn =
+    localStorage.getItem("isLoggedIn") === "true";
+
+
+// Redirect unauthenticated users
+if (isProtectedPage && !isLoggedIn) {
+
+    window.location.href = "login.html";
+
+}
+
+
+// =========================
+// REDIRECT LOGGED-IN USERS
+// =========================
+
+if (
+    pageName === "login.html" &&
+    isLoggedIn
+) {
+
+    window.location.href = "dashboard.html";
+
+}
+
+
+// =========================
+// LOGIN FORM
+// =========================
+
+const loginForm =
+    document.getElementById("loginForm");
+
+
+if (loginForm) {
+
+    loginForm.addEventListener(
+        "submit",
+        function (event) {
+
+            event.preventDefault();
+
+
+            const email =
+                document.getElementById("email");
+
+            const password =
+                document.getElementById("password");
+
+
+            let isValid = true;
+
+
+            // Email validation
+
+            if (
+                !email ||
+                !email.value.trim() ||
+                !email.validity.valid
+            ) {
+
+                email.classList.add("is-invalid");
+
+                isValid = false;
+
+            } else {
+
+                email.classList.remove("is-invalid");
+                email.classList.add("is-valid");
+
+            }
+
+
+            // Password validation
+
+            if (
+                !password ||
+                password.value.length < 6
+            ) {
+
+                password.classList.add("is-invalid");
+
+                isValid = false;
+
+            } else {
+
+                password.classList.remove("is-invalid");
+                password.classList.add("is-valid");
+
+            }
+
+
+            if (!isValid) {
+
+                return;
+
+            }
+
+
+            // Temporary frontend authentication
+
+            localStorage.setItem(
+                "isLoggedIn",
+                "true"
+            );
+
+
+            // Save temporary user information
+
+            localStorage.setItem(
+                "userEmail",
+                email.value.trim()
+            );
+
+
+            // Redirect to dashboard
+
+            window.location.href =
+                "dashboard.html";
+
+        }
+    );
+
+}
+
+
+// =========================
+// LOGOUT
+// =========================
+
+const logoutButton =
+    document.getElementById("logoutButton");
+
+
+if (logoutButton) {
+
+    logoutButton.addEventListener(
+        "click",
+        function () {
+
+            localStorage.removeItem(
+                "isLoggedIn"
+            );
+
+
+            localStorage.removeItem(
+                "userEmail"
+            );
+
+
+            window.location.href =
+                "login.html";
+
+        }
+    );
+
+}
+
+
+// =========================
+// DISPLAY LOGGED-IN USER
+// =========================
+
+const loggedInUser =
+    document.getElementById("loggedInUser");
+
+
+if (loggedInUser) {
+
+    const userEmail =
+        localStorage.getItem("userEmail");
+
+
+    if (userEmail) {
+
+        loggedInUser.textContent =
+            userEmail;
+
+    }
+
+}
+
