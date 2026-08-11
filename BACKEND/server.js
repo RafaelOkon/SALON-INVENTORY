@@ -5,11 +5,28 @@ const app = express();
 const PORT = 5000;
 
 
-// Middleware
+// =========================
+// MIDDLEWARE
+// =========================
+
 app.use(express.json());
 
 
-// Test route
+// =========================
+// ROUTES
+// =========================
+
+const testRoutes =
+    require("./routes/testRoutes");
+
+
+app.use("/api/test", testRoutes);
+
+
+// =========================
+// ROOT ROUTE
+// =========================
+
 app.get("/", (req, res) => {
 
     res.json({
@@ -20,7 +37,10 @@ app.get("/", (req, res) => {
 });
 
 
-// Start server
+// =========================
+// START SERVER
+// =========================
+
 app.listen(PORT, () => {
 
     console.log(
