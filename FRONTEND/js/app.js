@@ -700,3 +700,368 @@ if (supplierForm) {
 
 }
 
+// =========================
+// STOCK SEARCH
+// =========================
+
+const stockSearch =
+    document.getElementById("stockSearch");
+
+if (stockSearch) {
+
+    stockSearch.addEventListener("input", function () {
+
+        filterStock();
+
+    });
+
+}
+
+
+// =========================
+// STOCK STATUS FILTER
+// =========================
+
+const stockStatusFilter =
+    document.getElementById("stockStatusFilter");
+
+if (stockStatusFilter) {
+
+    stockStatusFilter.addEventListener("change", function () {
+
+        filterStock();
+
+    });
+
+}
+
+
+// =========================
+// STOCK FILTER FUNCTION
+// =========================
+
+function filterStock() {
+
+    const searchInput =
+        document.getElementById("stockSearch");
+
+    const statusFilter =
+        document.getElementById("stockStatusFilter");
+
+    const rows =
+        document.querySelectorAll(
+            "#stockTable tbody tr"
+        );
+
+
+    const searchValue =
+        searchInput
+            ? searchInput.value.toLowerCase().trim()
+            : "";
+
+
+    const selectedStatus =
+        statusFilter
+            ? statusFilter.value
+            : "";
+
+
+    let visibleProducts = 0;
+
+
+    rows.forEach(function (row) {
+
+        const productName =
+            row
+                .querySelector("td:nth-child(2)")
+                .textContent
+                .toLowerCase();
+
+
+        const statusElement =
+            row.querySelector("td:nth-child(7)");
+
+
+        const statusText =
+            statusElement
+                .textContent
+                .toLowerCase()
+                .trim();
+
+
+        let matchesSearch =
+            productName.includes(searchValue);
+
+
+        let matchesStatus = true;
+
+
+        if (selectedStatus === "in-stock") {
+
+            matchesStatus =
+                statusText === "in stock";
+
+        }
+
+
+        if (selectedStatus === "low-stock") {
+
+            matchesStatus =
+                statusText === "low stock";
+
+        }
+
+
+        if (selectedStatus === "out-of-stock") {
+
+            matchesStatus =
+                statusText === "out of stock";
+
+        }
+
+
+        if (matchesSearch && matchesStatus) {
+
+            row.style.display = "";
+
+            visibleProducts++;
+
+        } else {
+
+            row.style.display = "none";
+
+        }
+
+    });
+
+
+    const stockCount =
+        document.getElementById("stockCount");
+
+
+    if (stockCount) {
+
+        stockCount.textContent =
+            `${visibleProducts} Products`;
+
+    }
+
+}
+
+
+// =========================
+// STOCK FILTER RESET
+// =========================
+
+const resetStockFilters =
+    document.getElementById("resetStockFilters");
+
+if (resetStockFilters) {
+
+    resetStockFilters.addEventListener("click", function () {
+
+        const searchInput =
+            document.getElementById("stockSearch");
+
+        const statusFilter =
+            document.getElementById("stockStatusFilter");
+
+
+        if (searchInput) {
+
+            searchInput.value = "";
+
+        }
+
+
+        if (statusFilter) {
+
+            statusFilter.value = "";
+
+        }
+
+
+        filterStock();
+
+    });
+
+}
+
+
+
+// =========================
+// STOCK IN FORM
+// =========================
+
+const stockInForm =
+    document.getElementById("stockInForm");
+
+if (stockInForm) {
+
+    stockInForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+
+        const product =
+            document.getElementById("stockInProduct");
+
+        const quantity =
+            document.getElementById("stockInQuantity");
+
+        const reason =
+            document.getElementById("stockInReason");
+
+
+        let isValid = true;
+
+
+        if (product.value === "") {
+
+            product.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            product.classList.remove("is-invalid");
+            product.classList.add("is-valid");
+
+        }
+
+
+        if (
+            quantity.value === "" ||
+            Number(quantity.value) < 1
+        ) {
+
+            quantity.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            quantity.classList.remove("is-invalid");
+            quantity.classList.add("is-valid");
+
+        }
+
+
+        if (reason.value === "") {
+
+            reason.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            reason.classList.remove("is-invalid");
+            reason.classList.add("is-valid");
+
+        }
+
+
+        if (!isValid) {
+
+            return;
+
+        }
+
+
+        alert(
+            "Stock-in form is valid. Backend connection will be added later."
+        );
+
+    });
+
+}
+
+
+// =========================
+// STOCK OUT FORM
+// =========================
+
+const stockOutForm =
+    document.getElementById("stockOutForm");
+
+if (stockOutForm) {
+
+    stockOutForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+
+        const product =
+            document.getElementById("stockOutProduct");
+
+        const quantity =
+            document.getElementById("stockOutQuantity");
+
+        const reason =
+            document.getElementById("stockOutReason");
+
+
+        let isValid = true;
+
+
+        if (product.value === "") {
+
+            product.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            product.classList.remove("is-invalid");
+            product.classList.add("is-valid");
+
+        }
+
+
+        if (
+            quantity.value === "" ||
+            Number(quantity.value) < 1
+        ) {
+
+            quantity.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            quantity.classList.remove("is-invalid");
+            quantity.classList.add("is-valid");
+
+        }
+
+
+        if (reason.value === "") {
+
+            reason.classList.add("is-invalid");
+
+            isValid = false;
+
+        } else {
+
+            reason.classList.remove("is-invalid");
+            reason.classList.add("is-valid");
+
+        }
+
+
+        if (!isValid) {
+
+            return;
+
+        }
+
+
+        alert(
+            "Stock-out form is valid. Backend connection will be added later."
+        );
+
+    });
+
+}
+
+

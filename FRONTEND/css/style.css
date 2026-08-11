@@ -202,3 +202,31 @@ body {
     text-align: center;
 }
 
+
+/* =========================
+   STOCK PAGE
+========================= */
+
+.stock-page .table th {
+    white-space: nowrap;
+}
+
+.stock-page .table td {
+    vertical-align: middle;
+}
+
+.stock-summary-icon {
+    width: 45px;
+    height: 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background-color: #f1f3f5;
+
+    font-size: 1.25rem;
+}
+
