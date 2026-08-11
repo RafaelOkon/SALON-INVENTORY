@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
 
     res.json({
         success: true,
-        message: "Salon Inventory Management API is running"
+        message: "Salon Inventory Management API is working"
     });
 
 });
