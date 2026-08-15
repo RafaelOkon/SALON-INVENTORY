@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -6,6 +7,9 @@ const pool = require("./config/database");
 
 const protect =
     require("./middleware/authMiddleware");
+
+const productRoutes =
+    require("./routes/productRoutes");
 
 dotenv.config();
 
@@ -35,7 +39,14 @@ app.use("/api/test", testRoutes);
 const authRoutes =
     require("./routes/authRoutes");
 
-app.use("/api/auth", authRoutes);
+app.use(
+    "/api/auth", 
+    authRoutes);
+
+app.use(
+    "/api/products",
+    productRoutes
+);
 
 
 app.get(
