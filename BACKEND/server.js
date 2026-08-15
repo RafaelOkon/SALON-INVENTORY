@@ -29,6 +29,10 @@ const testRoutes =
 
 app.use("/api/test", testRoutes);
 
+const authRoutes =
+    require("./routes/authRoutes");
+
+app.use("/api/auth", authRoutes);
 
 // =========================
 // DATABASE TEST
