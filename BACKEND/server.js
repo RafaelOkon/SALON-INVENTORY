@@ -4,6 +4,9 @@ const dotenv = require("dotenv");
 
 const pool = require("./config/database");
 
+const protect =
+    require("./middleware/authMiddleware");
+
 dotenv.config();
 
 const app = express();
@@ -33,6 +36,26 @@ const authRoutes =
     require("./routes/authRoutes");
 
 app.use("/api/auth", authRoutes);
+
+
+app.get(
+    "/api/protected",
+    protect,
+    (req, res) => {
+
+        res.json({
+
+            success: true,
+
+            message:
+                "You accessed a protected route",
+
+            user: req.user
+
+        });
+
+    }
+);
 
 // =========================
 // DATABASE TEST
