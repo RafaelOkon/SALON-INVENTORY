@@ -11,6 +11,9 @@ const protect =
 const productRoutes =
     require("./routes/productRoutes");
 
+    const categoryRoutes =
+    require("./routes/categoryRoutes");
+
 dotenv.config();
 
 const app = express();
@@ -41,12 +44,19 @@ const authRoutes =
 
 app.use(
     "/api/auth", 
-    authRoutes);
+    authRoutes
+);
 
 app.use(
     "/api/products",
     productRoutes
 );
+
+app.use(
+    "/api/categories",
+    categoryRoutes
+);
+
 
 
 app.get(
