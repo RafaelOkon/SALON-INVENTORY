@@ -21,6 +21,9 @@ const protect =
     const supplierRoutes =
     require("./routes/supplierRoutes");
 
+    const inventoryRoutes =
+    require("./routes/inventoryRoutes");
+
 
 
 dotenv.config();
@@ -67,6 +70,11 @@ app.use(
 app.use(
     "/api/suppliers",
     supplierRoutes
+);
+
+app.use(
+    "/api/inventory",
+    inventoryRoutes
 );
 
 
