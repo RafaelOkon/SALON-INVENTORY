@@ -5,14 +5,23 @@ const dotenv = require("dotenv");
 
 const pool = require("./config/database");
 
+
 const protect =
     require("./middleware/authMiddleware");
 
-const productRoutes =
+    const authRoutes =
+    require("./routes/authRoutes");
+
+    const productRoutes =
     require("./routes/productRoutes");
 
     const categoryRoutes =
     require("./routes/categoryRoutes");
+
+    const supplierRoutes =
+    require("./routes/supplierRoutes");
+
+
 
 dotenv.config();
 
@@ -39,8 +48,6 @@ const testRoutes =
 
 app.use("/api/test", testRoutes);
 
-const authRoutes =
-    require("./routes/authRoutes");
 
 app.use(
     "/api/auth", 
@@ -55,6 +62,11 @@ app.use(
 app.use(
     "/api/categories",
     categoryRoutes
+);
+
+app.use(
+    "/api/suppliers",
+    supplierRoutes
 );
 
 
