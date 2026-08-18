@@ -27,6 +27,9 @@ const protect =
     const stockTransactionRoutes =
     require("./routes/stockTransactionRoutes");
 
+    const dashboardRoutes =
+    require("./routes/dashboardRoutes");
+
 
 
 dotenv.config();
@@ -78,6 +81,11 @@ app.use(
 app.use(
     "/api/inventory",
     inventoryRoutes
+);
+
+app.use(
+    "/api/dashboard",
+    dashboardRoutes
 );
 
 app.use(
