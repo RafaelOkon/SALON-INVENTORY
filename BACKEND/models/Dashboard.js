@@ -49,7 +49,7 @@ const getDashboardStatistics = async () => {
 
 
     // ========================================
-    // LOW STOCK PRODUCTS
+    // LOW STOCK COUNT
     // ========================================
 
     const [lowStockRows] = await pool.query(`
@@ -61,7 +61,7 @@ const getDashboardStatistics = async () => {
 
 
     // ========================================
-    // OUT OF STOCK PRODUCTS
+    // OUT OF STOCK COUNT
     // ========================================
 
     const [outOfStockRows] = await pool.query(`
@@ -71,25 +71,126 @@ const getDashboardStatistics = async () => {
     `);
 
 
+    // ========================================
+    // LOW STOCK PRODUCTS
+    // ========================================
+
+    const [lowStockProducts] = await pool.query(`
+        SELECT
+
+            i.id,
+
+            i.product_id,
+
+            p.name AS product_name,
+
+            p.sku,
+
+            i.quantity,
+
+            i.reorder_level,
+
+            CASE
+
+                WHEN i.quantity = 0
+                    THEN 'OUT_OF_STOCK'
+
+                WHEN i.quantity <= i.reorder_level
+                    THEN 'LOW_STOCK'
+
+                ELSE 'IN_STOCK'
+
+            END AS stock_status
+
+        FROM inventory i
+
+        INNER JOIN products p
+            ON i.product_id = p.id
+
+        WHERE i.quantity <= i.reorder_level
+
+        ORDER BY i.quantity ASC
+
+        LIMIT 10
+    `);
+
+
+    // ========================================
+    // RECENT STOCK TRANSACTIONS
+    // ========================================
+
+    const [recentTransactions] = await pool.query(`
+        SELECT
+
+            st.id,
+
+            st.product_id,
+
+            p.name AS product_name,
+
+            p.sku,
+
+            st.user_id,
+
+            name AS user_name,
+
+            st.transaction_type,
+
+            st.quantity,
+
+            st.notes,
+
+            st.created_at
+
+        FROM stock_transactions st
+
+        INNER JOIN products p
+            ON st.product_id = p.id
+
+        INNER JOIN users u
+            ON st.user_id = u.id
+
+        ORDER BY st.created_at DESC
+
+        LIMIT 10
+    `);
+
+
+    // ========================================
+    // RETURN DASHBOARD DATA
+    // ========================================
+
     return {
 
-        totalProducts:
-            productRows[0].total_products,
+        summary: {
 
-        totalCategories:
-            categoryRows[0].total_categories,
+            totalProducts:
+                productRows[0].total_products,
 
-        totalSuppliers:
-            supplierRows[0].total_suppliers,
+            totalCategories:
+                categoryRows[0].total_categories,
 
-        totalStock:
-            stockRows[0].total_stock,
+            totalSuppliers:
+                supplierRows[0].total_suppliers,
 
-        lowStockProducts:
-            lowStockRows[0].low_stock_products,
+            totalStock:
+                stockRows[0].total_stock,
 
-        outOfStockProducts:
-            outOfStockRows[0].out_of_stock_products
+            lowStockProducts:
+                lowStockRows[0].low_stock_products,
+
+            outOfStockProducts:
+                outOfStockRows[0].out_of_stock_products
+
+        },
+
+
+        lowStockItems:
+            lowStockProducts,
+
+
+        recentTransactions:
+            recentTransactions
 
     };
 
@@ -99,4 +200,3 @@ const getDashboardStatistics = async () => {
 module.exports = {
     getDashboardStatistics
 };
-
