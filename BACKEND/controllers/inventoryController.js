@@ -8,6 +8,10 @@ const {
     deleteInventory
 } = require("../models/Inventory");
 
+const {
+    createStockTransaction
+} = require("../models/StockTransaction");
+
 
 // ========================================
 // CREATE INVENTORY
@@ -577,9 +581,9 @@ const updateInventoryController = async (
 };
 
 
-// ========================================
+//=========================================
 // STOCK IN
-// ========================================
+//=========================================
 
 const stockInController = async (
     req,
@@ -590,15 +594,21 @@ const stockInController = async (
 
         const { productId } = req.params;
 
-        const { quantity } = req.body;
+        const {
+            quantity,
+            notes
+        } = req.body;
 
 
-        // Validate product ID
+        // ========================================
+        // VALIDATE PRODUCT ID
+        // ========================================
 
         if (
             !Number.isInteger(
                 Number(productId)
-            )
+            ) ||
+            Number(productId) <= 0
         ) {
 
             return res.status(400).json({
@@ -613,12 +623,16 @@ const stockInController = async (
         }
 
 
-        // Validate quantity
+        // ========================================
+        // VALIDATE QUANTITY
+        // ========================================
 
         if (
             quantity === undefined ||
             quantity === null ||
-            !Number.isInteger(Number(quantity)) ||
+            !Number.isInteger(
+                Number(quantity)
+            ) ||
             Number(quantity) <= 0
         ) {
 
@@ -634,7 +648,17 @@ const stockInController = async (
         }
 
 
-        // Check inventory exists
+        // ========================================
+        // GET USER FROM JWT
+        // ========================================
+
+        const userId =
+            req.user.id;
+
+
+        // ========================================
+        // CHECK INVENTORY
+        // ========================================
 
         const inventory =
             await getInventoryByProductId(
@@ -655,6 +679,10 @@ const stockInController = async (
 
         }
 
+
+        // ========================================
+        // UPDATE STOCK
+        // ========================================
 
         const affectedRows =
             await updateStockQuantity(
@@ -680,7 +708,33 @@ const stockInController = async (
         }
 
 
-        // Get updated inventory
+        // ========================================
+        // RECORD TRANSACTION
+        // ========================================
+
+        await createStockTransaction({
+
+            product_id:
+                Number(productId),
+
+            user_id:
+                Number(userId),
+
+            transaction_type:
+                "STOCK_IN",
+
+            quantity:
+                Number(quantity),
+
+            notes:
+                notes || "Stock added"
+
+        });
+
+
+        // ========================================
+        // GET UPDATED INVENTORY
+        // ========================================
 
         const updatedInventory =
             await getInventoryByProductId(
@@ -731,10 +785,9 @@ const stockInController = async (
 
 };
 
-
-// ========================================
+//=========================================
 // STOCK OUT
-// ========================================
+//=========================================
 
 const stockOutController = async (
     req,
@@ -745,15 +798,21 @@ const stockOutController = async (
 
         const { productId } = req.params;
 
-        const { quantity } = req.body;
+        const {
+            quantity,
+            notes
+        } = req.body;
 
 
-        // Validate product ID
+        // ========================================
+        // VALIDATE PRODUCT ID
+        // ========================================
 
         if (
             !Number.isInteger(
                 Number(productId)
-            )
+            ) ||
+            Number(productId) <= 0
         ) {
 
             return res.status(400).json({
@@ -768,12 +827,16 @@ const stockOutController = async (
         }
 
 
-        // Validate quantity
+        // ========================================
+        // VALIDATE QUANTITY
+        // ========================================
 
         if (
             quantity === undefined ||
             quantity === null ||
-            !Number.isInteger(Number(quantity)) ||
+            !Number.isInteger(
+                Number(quantity)
+            ) ||
             Number(quantity) <= 0
         ) {
 
@@ -789,7 +852,17 @@ const stockOutController = async (
         }
 
 
-        // Get current inventory
+        // ========================================
+        // GET USER FROM JWT
+        // ========================================
+
+        const userId =
+            req.user.id;
+
+
+        // ========================================
+        // GET CURRENT INVENTORY
+        // ========================================
 
         const inventory =
             await getInventoryByProductId(
@@ -811,15 +884,16 @@ const stockOutController = async (
         }
 
 
+        // ========================================
+        // CHECK AVAILABLE STOCK
+        // ========================================
+
         const requestedQuantity =
             Number(quantity);
-
 
         const currentQuantity =
             Number(inventory.quantity);
 
-
-        // Prevent negative stock
 
         if (
             requestedQuantity >
@@ -848,7 +922,9 @@ const stockOutController = async (
         }
 
 
-        // Subtract stock
+        // ========================================
+        // REMOVE STOCK
+        // ========================================
 
         const affectedRows =
             await updateStockQuantity(
@@ -874,7 +950,33 @@ const stockOutController = async (
         }
 
 
-        // Get updated inventory
+        // ========================================
+        // RECORD TRANSACTION
+        // ========================================
+
+        await createStockTransaction({
+
+            product_id:
+                Number(productId),
+
+            user_id:
+                Number(userId),
+
+            transaction_type:
+                "STOCK_OUT",
+
+            quantity:
+                requestedQuantity,
+
+            notes:
+                notes || "Stock removed"
+
+        });
+
+
+        // ========================================
+        // GET UPDATED INVENTORY
+        // ========================================
 
         const updatedInventory =
             await getInventoryByProductId(
