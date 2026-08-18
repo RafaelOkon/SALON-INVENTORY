@@ -224,6 +224,151 @@ const deleteProduct = async (id) => {
 
 };
 
+// ========================================
+// SEARCH AND FILTER PRODUCTS
+// ========================================
+
+const searchProducts = async (filters) => {
+
+    const {
+        search,
+        category,
+        supplier
+    } = filters;
+
+
+    let query = `
+        SELECT
+
+            p.id,
+
+            p.name,
+
+            p.sku,
+
+            p.description,
+
+            p.price,
+
+            p.category_id,
+
+            c.name AS category_name,
+
+            p.supplier_id,
+
+            s.name AS supplier_name,
+
+            p.created_at,
+
+            p.updated_at
+
+        FROM products p
+
+        LEFT JOIN categories c
+            ON p.category_id = c.id
+
+        LEFT JOIN suppliers s
+            ON p.supplier_id = s.id
+
+        WHERE 1 = 1
+    `;
+
+
+    const values = [];
+
+
+    // ========================================
+    // SEARCH BY PRODUCT NAME OR SKU
+    // ========================================
+
+    if (search && search.trim() !== "") {
+
+        query += `
+            AND (
+                p.name LIKE ?
+                OR p.sku LIKE ?
+                OR p.description LIKE ?
+            )
+        `;
+
+
+        const searchValue =
+            `%${search.trim()}%`;
+
+
+        values.push(
+            searchValue,
+            searchValue,
+            searchValue
+        );
+
+    }
+
+
+    // ========================================
+    // FILTER BY CATEGORY
+    // ========================================
+
+    if (
+        category !== undefined &&
+        category !== null &&
+        category !== ""
+    ) {
+
+        query += `
+            AND p.category_id = ?
+        `;
+
+
+        values.push(
+            Number(category)
+        );
+
+    }
+
+
+    // ========================================
+    // FILTER BY SUPPLIER
+    // ========================================
+
+    if (
+        supplier !== undefined &&
+        supplier !== null &&
+        supplier !== ""
+    ) {
+
+        query += `
+            AND p.supplier_id = ?
+        `;
+
+
+        values.push(
+            Number(supplier)
+        );
+
+    }
+
+
+    // ========================================
+    // ORDER RESULTS
+    // ========================================
+
+    query += `
+        ORDER BY p.created_at DESC
+    `;
+
+
+    const [rows] =
+        await pool.query(
+            query,
+            values
+        );
+
+
+    return rows;
+
+};
+
 
 // ========================================
 // EXPORT FUNCTIONS
@@ -239,6 +384,8 @@ module.exports = {
 
     updateProduct,
 
-    deleteProduct
+    deleteProduct,
+
+    searchProducts
 
 };

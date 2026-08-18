@@ -3,7 +3,8 @@ const {
     getAllProducts,
     getProductById,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    searchProducts
 } = require("../models/Product");
 
 
@@ -599,6 +600,132 @@ const deleteProductController = async (req, res) => {
 
 };
 
+// ========================================
+// SEARCH AND FILTER PRODUCTS
+// ========================================
+
+const searchProductsController = async (
+    req,
+    res
+) => {
+
+    try {
+
+        const {
+            search,
+            category,
+            supplier
+        } = req.query;
+
+
+        // ========================================
+        // VALIDATE CATEGORY
+        // ========================================
+
+        if (
+            category !== undefined &&
+            category !== "" &&
+            (
+                !Number.isInteger(
+                    Number(category)
+                ) ||
+                Number(category) <= 0
+            )
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Invalid category ID"
+
+            });
+
+        }
+
+
+        // ========================================
+        // VALIDATE SUPPLIER
+        // ========================================
+
+        if (
+            supplier !== undefined &&
+            supplier !== "" &&
+            (
+                !Number.isInteger(
+                    Number(supplier)
+                ) ||
+                Number(supplier) <= 0
+            )
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Invalid supplier ID"
+
+            });
+
+        }
+
+
+        // ========================================
+        // SEARCH PRODUCTS
+        // ========================================
+
+        const products = await searchProducts({
+
+            search:
+                search
+                    ? search.trim()
+                    : "",
+
+            category:
+                category
+                    ? Number(category)
+                    : "",
+
+            supplier:
+                supplier
+                    ? Number(supplier)
+                    : ""
+
+        });
+
+
+        return res.status(200).json({
+
+            success: true,
+
+            count: products.length,
+
+            data: products
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Search products error:",
+            error
+        );
+
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Server error while searching products"
+
+        });
+
+    }
+
+};
 
 // ========================================
 // EXPORT CONTROLLERS
@@ -614,6 +741,8 @@ module.exports = {
 
     updateProductController,
 
-    deleteProductController
+    deleteProductController,
+    
+    searchProductsController
 
 };

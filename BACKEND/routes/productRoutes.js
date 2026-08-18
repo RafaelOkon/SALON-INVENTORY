@@ -8,7 +8,8 @@ const {
     getProductsController,
     getProductController,
     updateProductController,
-    deleteProductController
+    deleteProductController,
+    searchProductsController
 } = require("../controllers/productController");
 
 
@@ -26,6 +27,16 @@ router.get(
     getProductsController
 );
 
+// ========================================
+// SEARCH AND FILTER PRODUCTS
+// GET /api/products/search
+// ========================================
+
+router.get(
+    "/search",
+    protect,
+    searchProductsController
+);
 
 // ========================================
 // GET PRODUCT BY ID
