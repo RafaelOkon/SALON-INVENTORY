@@ -1,5 +1,8 @@
 const express = require("express");
 
+const authorizeRoles =
+    require("../middleware/roleMiddleware");
+
 const protect =
     require("../middleware/authMiddleware");
 
@@ -58,6 +61,7 @@ router.get(
 router.post(
     "/",
     protect,
+    authorizeRoles("ADMIN"),
     createProductController
 );
 
@@ -66,10 +70,10 @@ router.post(
 // UPDATE PRODUCT
 // PUT /api/products/:id
 // ========================================
-
 router.put(
     "/:id",
     protect,
+    authorizeRoles("ADMIN"),
     updateProductController
 );
 
@@ -82,8 +86,9 @@ router.put(
 router.delete(
     "/:id",
     protect,
+    authorizeRoles("ADMIN"),
     deleteProductController
 );
 
-
 module.exports = router;
+

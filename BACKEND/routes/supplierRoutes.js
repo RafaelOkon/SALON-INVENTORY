@@ -3,6 +3,9 @@ const express = require("express");
 const protect =
     require("../middleware/authMiddleware");
 
+    const authorizeRoles =
+    require("../middleware/roleMiddleware");
+
 const {
     createSupplierController,
     getSuppliersController,
@@ -43,10 +46,10 @@ router.get(
 // CREATE SUPPLIER
 // POST /api/suppliers
 // ========================================
-
 router.post(
     "/",
     protect,
+    authorizeRoles("ADMIN"),
     createSupplierController
 );
 
@@ -59,6 +62,7 @@ router.post(
 router.put(
     "/:id",
     protect,
+    authorizeRoles("ADMIN"),
     updateSupplierController
 );
 
@@ -71,6 +75,7 @@ router.put(
 router.delete(
     "/:id",
     protect,
+    authorizeRoles("ADMIN"),
     deleteSupplierController
 );
 

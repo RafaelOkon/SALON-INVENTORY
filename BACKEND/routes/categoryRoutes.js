@@ -3,6 +3,9 @@ const express = require("express");
 const protect =
     require("../middleware/authMiddleware");
 
+    const authorizeRoles =
+    require("../middleware/roleMiddleware");
+
 const {
     createCategoryController,
     getCategoriesController,
@@ -26,7 +29,6 @@ router.get(
     getCategoriesController
 );
 
-
 // ========================================
 // GET CATEGORY BY ID
 // GET /api/categories/:id
@@ -47,6 +49,7 @@ router.get(
 router.post(
     "/",
     protect,
+    authorizeRoles("ADMIN"),
     createCategoryController
 );
 
@@ -59,6 +62,7 @@ router.post(
 router.put(
     "/:id",
     protect,
+    authorizeRoles("ADMIN"),
     updateCategoryController
 );
 
@@ -71,6 +75,7 @@ router.put(
 router.delete(
     "/:id",
     protect,
+    authorizeRoles("ADMIN"),
     deleteCategoryController
 );
 
