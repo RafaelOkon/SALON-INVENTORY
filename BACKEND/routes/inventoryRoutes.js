@@ -69,6 +69,13 @@ router.post(
     stockInController
 );
 
+router.post(
+    "/stock-out/:productId",
+    protect,
+    authorizeRoles("ADMIN", "STAFF"),
+    stockOutController
+);
+
 
 // ========================================
 // UPDATE INVENTORY
