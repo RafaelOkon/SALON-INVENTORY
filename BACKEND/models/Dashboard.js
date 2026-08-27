@@ -46,7 +46,15 @@ const getDashboardStatistics = async () => {
             COALESCE(SUM(quantity), 0) AS total_stock
         FROM inventory
     `);
+// ========================================
+// OUT OF STOCK COUNT
+// ========================================
 
+const [outOfStockRows] = await pool.query(`
+    SELECT COUNT(*) AS out_of_stock_products
+    FROM inventory
+    WHERE quantity = 0
+`);
 
     // ========================================
     // LOW STOCK COUNT
@@ -59,102 +67,91 @@ const getDashboardStatistics = async () => {
         AND quantity <= reorder_level
     `);
 
+// ========================================
+// LOW STOCK PRODUCTS
+// ========================================
 
-    // ========================================
-    // OUT OF STOCK COUNT
-    // ========================================
+const [lowStockProducts] = await pool.query(`
+    SELECT
 
-    const [outOfStockRows] = await pool.query(`
-        SELECT COUNT(*) AS out_of_stock_products
-        FROM inventory
-        WHERE quantity = 0
-    `);
+        i.id,
 
+        i.product_id,
 
-    // ========================================
-    // LOW STOCK PRODUCTS
-    // ========================================
+        p.name AS product_name,
 
-    const [lowStockProducts] = await pool.query(`
-        SELECT
+        p.sku,
 
-            i.id,
+        i.quantity,
 
-            i.product_id,
+        i.reorder_level,
 
-            p.name AS product_name,
+        CASE
 
-            p.sku,
+            WHEN i.quantity = 0
+                THEN 'OUT_OF_STOCK'
 
-            i.quantity,
+            WHEN i.quantity <= i.reorder_level
+                THEN 'LOW_STOCK'
 
-            i.reorder_level,
+            ELSE 'IN_STOCK'
 
-            CASE
+        END AS stock_status
 
-                WHEN i.quantity = 0
-                    THEN 'OUT_OF_STOCK'
+    FROM inventory i
 
-                WHEN i.quantity <= i.reorder_level
-                    THEN 'LOW_STOCK'
+    INNER JOIN products p
+        ON i.product_id = p.id
 
-                ELSE 'IN_STOCK'
+    WHERE i.quantity > 0
+    AND i.quantity <= i.reorder_level
 
-            END AS stock_status
+    ORDER BY i.quantity ASC
 
-        FROM inventory i
-
-        INNER JOIN products p
-            ON i.product_id = p.id
-
-        WHERE i.quantity <= i.reorder_level
-
-        ORDER BY i.quantity ASC
-
-        LIMIT 10
-    `);
+    LIMIT 10
+`);
 
 
-    // ========================================
-    // RECENT STOCK TRANSACTIONS
-    // ========================================
 
-    const [recentTransactions] = await pool.query(`
-        SELECT
+// ========================================
+// RECENT STOCK TRANSACTIONS
+// ========================================
 
-            st.id,
+const [recentTransactions] = await pool.query(`
+    SELECT
 
-            st.product_id,
+        st.id,
 
-            p.name AS product_name,
+        st.product_id,
 
-            p.sku,
+        p.name AS product_name,
 
-            st.user_id,
+        p.sku,
 
-            name AS user_name,
+        st.user_id,
 
-            st.transaction_type,
+        u.full_name AS user_name,
 
-            st.quantity,
+        st.transaction_type,
 
-            st.notes,
+        st.quantity,
 
-            st.created_at
+        st.notes,
 
-        FROM stock_transactions st
+        st.created_at
 
-        INNER JOIN products p
-            ON st.product_id = p.id
+    FROM stock_transactions st
 
-        INNER JOIN users u
-            ON st.user_id = u.id
+    INNER JOIN products p
+        ON st.product_id = p.id
 
-        ORDER BY st.created_at DESC
+    INNER JOIN users u
+        ON st.user_id = u.id
 
-        LIMIT 10
-    `);
+    ORDER BY st.created_at DESC
 
+    LIMIT 10
+`);
 
     // ========================================
     // RETURN DASHBOARD DATA
@@ -200,3 +197,4 @@ const getDashboardStatistics = async () => {
 module.exports = {
     getDashboardStatistics
 };
+

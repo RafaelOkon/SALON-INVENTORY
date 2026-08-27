@@ -317,6 +317,102 @@ const deleteInventory = async (id) => {
 
 
 // ========================================
+// GET LOW STOCK INVENTORY
+// ========================================
+
+const getLowStockInventory = async () => {
+
+    const [rows] = await pool.query(
+
+        `
+        SELECT
+
+            i.id,
+
+            i.product_id,
+
+            p.name AS product_name,
+
+            p.sku,
+
+            p.price,
+
+            i.quantity,
+
+            i.reorder_level,
+
+            'LOW_STOCK' AS stock_status,
+
+            i.created_at,
+
+            i.updated_at
+
+        FROM inventory i
+
+        INNER JOIN products p
+            ON i.product_id = p.id
+
+        WHERE i.quantity > 0
+        AND i.quantity <= i.reorder_level
+
+        ORDER BY i.quantity ASC
+        `
+
+    );
+
+    return rows;
+
+};
+
+
+// ========================================
+// GET OUT OF STOCK INVENTORY
+// ========================================
+
+const getOutOfStockInventory = async () => {
+
+    const [rows] = await pool.query(
+
+        `
+        SELECT
+
+            i.id,
+
+            i.product_id,
+
+            p.name AS product_name,
+
+            p.sku,
+
+            p.price,
+
+            i.quantity,
+
+            i.reorder_level,
+
+            'OUT_OF_STOCK' AS stock_status,
+
+            i.created_at,
+
+            i.updated_at
+
+        FROM inventory i
+
+        INNER JOIN products p
+            ON i.product_id = p.id
+
+        WHERE i.quantity = 0
+
+        ORDER BY i.updated_at DESC
+        `
+
+    );
+
+    return rows;
+
+};
+
+// ========================================
 // EXPORT FUNCTIONS
 // ========================================
 
@@ -334,7 +430,11 @@ module.exports = {
 
     updateStockQuantity,
 
-    deleteInventory
+    deleteInventory,
+
+    getLowStockInventory,
+
+    getOutOfStockInventory
 
 };
 

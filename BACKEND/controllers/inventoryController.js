@@ -5,7 +5,9 @@ const {
     getInventoryByProductId,
     updateInventory,
     updateStockQuantity,
-    deleteInventory
+    deleteInventory,
+    getLowStockInventory,
+    getOutOfStockInventory
 } = require("../models/Inventory");
 
 const {
@@ -1129,6 +1131,89 @@ const deleteInventoryController = async (
 };
 
 
+
+// ========================================
+// GET LOW STOCK INVENTORY
+// ========================================
+
+const getLowStockController = async (req, res) => {
+
+    try {
+
+        const inventory =
+            await getLowStockInventory();
+
+        return res.status(200).json({
+
+            success: true,
+
+            count: inventory.length,
+
+            data: inventory
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Get low stock error:",
+            error
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Server error while retrieving low stock inventory"
+
+        });
+
+    }
+
+};
+
+
+// ========================================
+// GET OUT OF STOCK INVENTORY
+// ========================================
+
+const getOutOfStockController = async (req, res) => {
+
+    try {
+
+        const inventory =
+            await getOutOfStockInventory();
+
+        return res.status(200).json({
+
+            success: true,
+
+            count: inventory.length,
+
+            data: inventory
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Get out of stock error:",
+            error
+        );
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                "Server error while retrieving out of stock inventory"
+
+        });
+
+    }
+
+};
 // ========================================
 // EXPORT CONTROLLERS
 // ========================================
@@ -1149,8 +1234,10 @@ module.exports = {
 
     stockOutController,
 
-    deleteInventoryController
+    deleteInventoryController,
+
+    getLowStockController,
+
+    getOutOfStockController
 
 };
-
-

@@ -2,18 +2,14 @@
 // API CONFIGURATION
 // ========================================
 
-const API_BASE_URL =
-    "http://localhost:5000/api";
+const API_BASE_URL = "http://127.0.0.1:5000/api";
 
 
-    // ========================================
+// ========================================
 // API REQUEST FUNCTION
 // ========================================
 
-const apiRequest = async (
-    endpoint,
-    options = {}
-) => {
+const apiRequest = async (endpoint, options = {}) => {
 
     try {
 
@@ -22,49 +18,44 @@ const apiRequest = async (
             options
         );
 
+        // Safely handle responses that may not contain JSON
+        const contentType = response.headers.get("content-type");
 
-        const data =
-            await response.json();
+        let data = {};
 
+        if (
+            contentType &&
+            contentType.includes("application/json")
+        ) {
+            data = await response.json();
+        } else {
+            data = {
+                message: await response.text()
+            };
+        }
 
         return {
-
-            success:
-                response.ok,
-
-            status:
-                response.status,
-
-            data
-
+            success: response.ok,
+            status: response.status,
+            data: data
         };
 
     } catch (error) {
 
-        console.error(
-            "API request error:",
-            error
-        );
-
+        console.error("API request error:", error);
 
         return {
-
             success: false,
-
             status: 0,
-
             data: {
-
-                message:
-                    "Unable to connect to the server"
-
+                message: "Unable to connect to the server"
             }
-
         };
 
     }
 
 };
+
 
 // ========================================
 // TOKEN MANAGEMENT
@@ -72,28 +63,21 @@ const apiRequest = async (
 
 const getToken = () => {
 
-    return localStorage.getItem(
-        "token"
-    );
+    return localStorage.getItem("token");
 
 };
 
 
 const saveToken = (token) => {
 
-    localStorage.setItem(
-        "token",
-        token
-    );
+    localStorage.setItem("token", token);
 
 };
 
 
 const removeToken = () => {
 
-    localStorage.removeItem(
-        "token"
-    );
+    localStorage.removeItem("token");
 
 };
 
@@ -107,20 +91,15 @@ const authenticatedRequest = async (
     options = {}
 ) => {
 
-    const token =
-        getToken();
-
+    const token = getToken();
 
     const headers = {
-
-        "Content-Type":
-            "application/json",
-
+        "Content-Type": "application/json",
         ...(options.headers || {})
-
     };
 
 
+    // Add JWT token when available
     if (token) {
 
         headers.Authorization =
@@ -132,13 +111,9 @@ const authenticatedRequest = async (
     return apiRequest(
         endpoint,
         {
-
             ...options,
-
             headers
-
         }
     );
 
 };
-

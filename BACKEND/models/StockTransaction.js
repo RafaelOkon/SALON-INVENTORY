@@ -65,7 +65,7 @@ const getAllStockTransactions = async () => {
 
             st.user_id,
 
-            u.name AS user_name,
+            u.full_name AS user_name,
 
             st.transaction_type,
 
@@ -77,7 +77,7 @@ const getAllStockTransactions = async () => {
 
         FROM stock_transactions st
 
-        INNER JOIN products p
+        INNER JOIN products pq
             ON st.product_id = p.id
 
         INNER JOIN users u
@@ -117,7 +117,7 @@ const getTransactionsByProductId = async (
 
             st.user_id,
 
-            u.name AS user_name,
+            u.full_name AS user_name,
 
             st.transaction_type,
 

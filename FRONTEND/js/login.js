@@ -119,6 +119,8 @@ loginForm.addEventListener(
                     }
                 );
 
+                 console.log("LOGIN RESPONSE:", result);
+                 console.log("LOGIN RESPONSE DATA:", result.data);
 
             // ========================================
             // CHECK RESPONSE
@@ -144,13 +146,28 @@ loginForm.addEventListener(
             // GET TOKEN
             // ========================================
 
-            const token =
-                result.data.token;
+                    const token =
+                result.data.data?.token || result.data.token;
+
+            if (!token) {
+
+                console.error(
+                    "Login response does not contain a token:",
+                    result.data
+                );
+                // ========================================
+            // SUCCESS MESSAGE
+            // ========================================
 
 
-            // ========================================
-            // SAVE TOKEN
-            // ========================================
+                loginMessage.innerHTML = `
+                    <div class="alert alert-danger">
+                        Login succeeded, but no authentication token was received.
+                    </div>
+                `;
+
+                return;
+            }
 
             saveToken(token);
 
@@ -159,28 +176,19 @@ loginForm.addEventListener(
             // SAVE USER DATA
             // ========================================
 
-            if (result.data.user) {
+            const user =
+                result.data.data?.user || result.data.user;
+
+            if (user) {
 
                 localStorage.setItem(
                     "user",
-                    JSON.stringify(
-                        result.data.user
-                    )
+                    JSON.stringify(user)
                 );
-
             }
 
 
-            // ========================================
-            // SUCCESS MESSAGE
-            // ========================================
-
-            loginMessage.innerHTML = `
-                <div class="alert alert-success">
-                    Login successful. Redirecting...
-                </div>
-            `;
-
+            
 
             // ========================================
             // REDIRECT

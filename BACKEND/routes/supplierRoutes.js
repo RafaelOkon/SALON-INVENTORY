@@ -49,7 +49,7 @@ router.get(
 router.post(
     "/",
     protect,
-    authorizeRoles("ADMIN"),
+    authorizeRoles("admin"),
     createSupplierController
 );
 
@@ -62,7 +62,7 @@ router.post(
 router.put(
     "/:id",
     protect,
-    authorizeRoles("ADMIN"),
+    authorizeRoles("admin"),
     updateSupplierController
 );
 
@@ -75,7 +75,7 @@ router.put(
 router.delete(
     "/:id",
     protect,
-    authorizeRoles("ADMIN"),
+    authorizeRoles("admin"),
     deleteSupplierController
 );
 

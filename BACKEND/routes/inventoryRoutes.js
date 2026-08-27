@@ -14,12 +14,37 @@ const {
     updateInventoryController,
     stockInController,
     stockOutController,
-    deleteInventoryController
+    deleteInventoryController,
+    getLowStockController,
+    getOutOfStockController
 } = require("../controllers/inventoryController");
 
 
 const router = express.Router();
 
+
+// ========================================
+// GET LOW STOCK INVENTORY
+// GET /api/inventory/low-stock
+// ========================================
+
+router.get(
+    "/low-stock",
+    protect,
+    getLowStockController
+);
+
+
+// ========================================
+// GET OUT OF STOCK INVENTORY
+// GET /api/inventory/out-of-stock
+// ========================================
+
+router.get(
+    "/out-of-stock",
+    protect,
+    getOutOfStockController
+);
 
 // ========================================
 // GET ALL INVENTORY
@@ -32,6 +57,19 @@ router.get(
     getInventoryController
 );
 
+
+
+// ========================================
+// CREATE INVENTORY
+// POST /api/inventory
+// ========================================
+
+router.post(
+    "/",
+    protect,
+    authorizeRoles("admin", "staff"),
+    createInventoryController
+);
 
 // ========================================
 // GET INVENTORY BY PRODUCT
@@ -65,14 +103,14 @@ router.get(
 router.post(
     "/stock-in/:productId",
     protect,
-    authorizeRoles("ADMIN", "STAFF"),
+    authorizeRoles("admin", "staff"),
     stockInController
 );
 
 router.post(
     "/stock-out/:productId",
     protect,
-    authorizeRoles("ADMIN", "STAFF"),
+    authorizeRoles("admin", "staff"),
     stockOutController
 );
 
@@ -90,30 +128,6 @@ router.put(
 
 
 // ========================================
-// STOCK IN
-// POST /api/inventory/stock-in/:productId
-// ========================================
-
-router.post(
-    "/stock-in/:productId",
-    protect,
-    stockInController
-);
-
-
-// ========================================
-// STOCK OUT
-// POST /api/inventory/stock-out/:productId
-// ========================================
-
-router.post(
-    "/stock-out/:productId",
-    protect,
-    stockOutController
-);
-
-
-// ========================================
 // DELETE INVENTORY
 // DELETE /api/inventory/:id
 // ========================================
@@ -126,4 +140,3 @@ router.delete(
 
 
 module.exports = router;
-
