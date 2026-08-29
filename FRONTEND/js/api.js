@@ -15,7 +15,10 @@ const apiRequest = async (endpoint, options = {}) => {
 
         const response = await fetch(
             `${API_BASE_URL}${endpoint}`,
-            options
+            {
+                ...options,
+                cache: "no-store"
+            }
         );
 
         // Safely handle responses that may not contain JSON
