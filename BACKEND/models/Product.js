@@ -250,6 +250,10 @@ const searchProducts = async (filters) => {
 
             p.price,
 
+            p.quantity,
+
+            p.minimum_stock_level,
+            
             p.category_id,
 
             c.name AS category_name,
