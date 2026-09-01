@@ -63,10 +63,9 @@ const createSupplierController = async (req, res) => {
         // Basic email validation
 
         if (
-            supplierEmail &&
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                .test(supplierEmail)
-        ) {
+        supplierEmail &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supplierEmail)
+    ) {
 
             return res.status(400).json({
 
@@ -631,3 +630,4 @@ module.exports = {
     deleteSupplierController
 
 };
+
