@@ -6,7 +6,9 @@ const API_BASE_URL = "http://localhost:5000/api";
 // ========================================
 
 function getToken() {
+
     return localStorage.getItem("token");
+
 }
 
 
@@ -14,52 +16,11 @@ function getToken() {
 // SAVE TOKEN
 // ========================================
 
-const apiRequest = async (endpoint, options = {}) => {
+function saveToken(token) {
 
-    try {
+    localStorage.setItem("token", token);
 
-        const response = await fetch(
-            `${API_BASE_URL}${endpoint}`,
-            options
-        );
-
-        // Safely handle responses that may not contain JSON
-        const contentType = response.headers.get("content-type");
-
-        let data = {};
-
-        if (
-            contentType &&
-            contentType.includes("application/json")
-        ) {
-            data = await response.json();
-        } else {
-            data = {
-                message: await response.text()
-            };
-        }
-
-        return {
-            success: response.ok,
-            status: response.status,
-            data: data
-        };
-
-    } catch (error) {
-
-        console.error("API request error:", error);
-
-        return {
-            success: false,
-            status: 0,
-            data: {
-                message: "Unable to connect to the server"
-            }
-        };
-
-    }
-
-};
+}
 
 
 // ========================================
@@ -67,8 +28,11 @@ const apiRequest = async (endpoint, options = {}) => {
 // ========================================
 
 function removeToken() {
+
     localStorage.removeItem("token");
+
 }
+
 
 // ========================================
 // API REQUEST
@@ -83,12 +47,16 @@ async function apiRequest(
 
 
     const headers = {
+
         "Content-Type": "application/json",
+
         ...(options.headers || {})
+
     };
 
 
-    // Add token if available
+    // Add JWT token when available
+
     if (token) {
 
         headers.Authorization =
@@ -98,15 +66,22 @@ async function apiRequest(
 
 
     const response = await fetch(
+
         `${API_BASE_URL}${endpoint}`,
+
         {
+
             ...options,
+
             headers
+
         }
+
     );
 
 
     let data;
+
 
     try {
 
@@ -143,33 +118,54 @@ async function authenticatedRequest(
 
     const token = getToken();
 
+
     if (!token) {
-        throw new Error("Authentication required");
+
+        throw new Error(
+            "Authentication required"
+        );
+
     }
 
 
     const headers = {
+
         "Content-Type": "application/json",
+
         ...(options.headers || {}),
-        "Authorization": `Bearer ${token}`
+
+        "Authorization":
+            `Bearer ${token}`
+
     };
 
 
     const response = await fetch(
+
         `${API_BASE_URL}${endpoint}`,
+
         {
+
             ...options,
+
             headers
+
         }
+
     );
 
 
     let data;
 
+
     try {
+
         data = await response.json();
+
     } catch (error) {
+
         data = {};
+
     }
 
 
@@ -178,25 +174,35 @@ async function authenticatedRequest(
         removeToken();
 
         throw new Error(
-            data.message || "Authentication required"
+
+            data.message ||
+            "Authentication required"
+
         );
+
     }
 
 
     if (!response.ok) {
 
         throw new Error(
+
             data.message ||
             "Request failed"
+
         );
+
     }
 
 
     return {
+
         success: true,
+
         status: response.status,
+
         data
+
     };
+
 }
-
-
