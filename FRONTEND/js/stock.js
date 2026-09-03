@@ -1,9 +1,10 @@
 // ========================================
 // STOCK MANAGEMENT
-// ========================================
-
+// ======================================
 let allProducts = [];
 
+let stockInSubmitting = false;
+let stockOutSubmitting = false;
 
 // ========================================
 // DOM ELEMENTS
@@ -24,11 +25,12 @@ const resetStockFilters =
 const stockCount =
     document.getElementById("stockCount");
 
-    const transactionTableBody =
+const transactionTableBody =
     document.getElementById("transactionTableBody");
 
 const transactionCount =
     document.getElementById("transactionCount");
+
 
 // ========================================
 // LOAD PRODUCTS
@@ -41,7 +43,8 @@ async function loadStockProducts() {
         const response =
             await authenticatedRequest("/products");
 
-        allProducts = response.data.data;
+        allProducts =
+            response.data.data || [];
 
         displayStockProducts(allProducts);
 
@@ -56,13 +59,20 @@ async function loadStockProducts() {
             error
         );
 
-        stockTableBody.innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center text-danger py-4">
-                    Failed to load stock data.
-                </td>
-            </tr>
-        `;
+        if (stockTableBody) {
+
+            stockTableBody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="8"
+                        class="text-center text-danger py-4"
+                    >
+                        Failed to load stock data.
+                    </td>
+                </tr>
+            `;
+
+        }
 
     }
 
@@ -75,17 +85,28 @@ async function loadStockProducts() {
 
 function displayStockProducts(products) {
 
+    if (!stockTableBody) {
+        return;
+    }
+
     stockTableBody.innerHTML = "";
 
-    stockCount.textContent =
-        `${products.length} Products`;
+    if (stockCount) {
+
+        stockCount.textContent =
+            `${products.length} Products`;
+
+    }
 
 
     if (products.length === 0) {
 
         stockTableBody.innerHTML = `
             <tr>
-                <td colspan="8" class="text-center text-muted py-4">
+                <td
+                    colspan="8"
+                    class="text-center text-muted py-4"
+                >
                     No products found.
                 </td>
             </tr>
@@ -364,7 +385,8 @@ function populateProductSelects(products) {
         const optionIn =
             document.createElement("option");
 
-        optionIn.value = product.id;
+        optionIn.value =
+            product.id;
 
         optionIn.textContent =
             `${product.name} (${product.sku})`;
@@ -373,7 +395,8 @@ function populateProductSelects(products) {
         const optionOut =
             document.createElement("option");
 
-        optionOut.value = product.id;
+        optionOut.value =
+            product.id;
 
         optionOut.textContent =
             `${product.name} (${product.sku})`;
@@ -471,6 +494,8 @@ function resetFilters() {
 
 function attachStockActionButtons() {
 
+    // STOCK IN BUTTONS
+
     document
         .querySelectorAll(".stock-in-btn")
         .forEach(button => {
@@ -492,6 +517,8 @@ function attachStockActionButtons() {
         });
 
 
+    // STOCK OUT BUTTONS
+
     document
         .querySelectorAll(".stock-out-btn")
         .forEach(button => {
@@ -504,6 +531,29 @@ function attachStockActionButtons() {
                         button.dataset.productId;
 
                     openStockOutModal(
+                        productId
+                    );
+
+                }
+            );
+
+        });
+
+
+    // STOCK HISTORY BUTTONS
+
+    document
+        .querySelectorAll(".stock-history-btn")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const productId =
+                        button.dataset.productId;
+
+                    viewProductStockHistory(
                         productId
                     );
 
@@ -527,13 +577,24 @@ function openStockInModal(productId) {
         );
 
 
-    select.value = productId;
+    if (!select) {
+        return;
+    }
+
+
+    select.value =
+        productId;
 
 
     const modalElement =
         document.getElementById(
             "stockInModal"
         );
+
+
+    if (!modalElement) {
+        return;
+    }
 
 
     const modal =
@@ -559,13 +620,29 @@ function openStockOutModal(productId) {
         );
 
 
-    select.value = productId;
+    if (!select) {
+        return;
+    }
+
+
+    select.value =
+        productId;
+
+
+    updateAvailableStockDisplay(
+        productId
+    );
 
 
     const modalElement =
         document.getElementById(
             "stockOutModal"
         );
+
+
+    if (!modalElement) {
+        return;
+    }
 
 
     const modal =
@@ -580,40 +657,143 @@ function openStockOutModal(productId) {
 
 
 // ========================================
+// SHOW AVAILABLE STOCK
+// ========================================
+
+function updateAvailableStockDisplay(productId) {
+
+    const quantityInput =
+        document.getElementById(
+            "stockOutQuantity"
+        );
+
+
+    if (!quantityInput) {
+        return;
+    }
+
+
+    let stockInfo =
+        document.getElementById(
+            "stockOutAvailableStock"
+        );
+
+
+    if (!stockInfo) {
+
+        stockInfo =
+            document.createElement("div");
+
+        stockInfo.id =
+            "stockOutAvailableStock";
+
+        stockInfo.className =
+            "form-text fw-semibold text-primary";
+
+
+        quantityInput.parentElement
+            .appendChild(stockInfo);
+
+    }
+
+
+    const product =
+        allProducts.find(
+            item =>
+                Number(item.id) ===
+                Number(productId)
+        );
+
+
+    if (product) {
+
+        stockInfo.textContent =
+            `Available stock: ${Number(
+                product.quantity
+            )}`;
+
+    } else {
+
+        stockInfo.textContent = "";
+
+    }
+
+}
+
+
+// ========================================
 // SUBMIT STOCK IN
 // ========================================
 
 async function submitStockIn(event) {
 
+        if (stockInSubmitting) {
+            return;
+        }
+
+        stockInSubmitting = true;
+
     event.preventDefault();
 
-    const form = event.target;
+
+    const form =
+        event.target;
+
 
     const productId =
-        document.getElementById("stockInProduct").value;
+        document.getElementById(
+            "stockInProduct"
+        ).value;
+
 
     const quantity =
-        document.getElementById("stockInQuantity").value;
+        document.getElementById(
+            "stockInQuantity"
+        ).value;
+
+    const reason =
+        document.getElementById(
+            "stockInReason"
+        ).value;
 
     const note =
-        document.getElementById("stockInNote").value.trim();
+        document.getElementById(
+            "stockInNote"
+        ).value.trim();
 
+
+    // ========================================
+    // VALIDATE PRODUCT
+    // ========================================
 
     if (!productId) {
 
-        alert("Please select a product.");
+        alert(
+            "Please select a product."
+        );
 
         return;
 
     }
 
 
+    // ========================================
+    // VALIDATE QUANTITY
+    // ========================================
+
+    const parsedQuantity =
+        Number(quantity);
+
+
     if (
-        !Number.isInteger(Number(quantity)) ||
-        Number(quantity) <= 0
+        quantity === "" ||
+        !Number.isInteger(parsedQuantity) ||
+        parsedQuantity <= 0
     ) {
 
-        alert("Please enter a valid quantity.");
+        alert(
+            "Please enter a valid positive whole number."
+        );
 
         return;
 
@@ -625,50 +805,62 @@ async function submitStockIn(event) {
         const response =
             await authenticatedRequest(
                 "/stock-transactions",
-                {
-                    method: "POST",
+            {
+                method: "POST",
 
-                    body: JSON.stringify({
+                body: JSON.stringify({
+                    product_id: Number(productId),
 
-                        product_id: Number(productId),
+                    transaction_type: "STOCK_IN",
 
-                        transaction_type: "STOCK_IN",
+                    quantity: parsedQuantity,
 
-                        quantity: Number(quantity),
-
-                        notes: note || null
-
-                    })
-
-                }
+                    notes: reason
+                        ? `${reason}${note ? " - " + note : ""}`
+                        : (note || null)
+                })
+            }
             );
 
 
         alert(
             response.data.message ||
-            "Stock added successfully."
+            `Stock In successful!\n\nQuantity added: ${parsedQuantity}`
         );
 
 
-        // Close modal
+        // ========================================
+        // CLOSE MODAL
+        // ========================================
+
         const modalElement =
-            document.getElementById("stockInModal");
+            document.getElementById(
+                "stockInModal"
+            );
+
 
         const modal =
             bootstrap.Modal.getInstance(
                 modalElement
             );
 
+
         if (modal) {
             modal.hide();
         }
 
 
-        // Reset form
+        // ========================================
+        // RESET FORM
+        // ========================================
+
         form.reset();
 
 
-        // Reload products
+        // ========================================
+        // REFRESH DATA
+        // ========================================
+
         await loadStockProducts();
 
         await loadStockTransactions();
@@ -685,9 +877,9 @@ async function submitStockIn(event) {
             error.message ||
             "Failed to add stock."
         );
-
+    } finally {
+        stockInSubmitting = false;
     }
-
 }
 
 
@@ -697,35 +889,74 @@ async function submitStockIn(event) {
 
 async function submitStockOut(event) {
 
+    if (stockOutSubmitting) {
+        return;
+    }
+
+    stockOutSubmitting = true;
+
     event.preventDefault();
 
-    const form = event.target;
+
+    const form =
+        event.target;
+
 
     const productId =
-        document.getElementById("stockOutProduct").value;
+        document.getElementById(
+            "stockOutProduct"
+        ).value;
+
 
     const quantity =
-        document.getElementById("stockOutQuantity").value;
+        document.getElementById(
+            "stockOutQuantity"
+        ).value;
+
+        const reason =
+         document.getElementById(
+            "stockOutReason"
+        ).value;
+
 
     const note =
-        document.getElementById("stockOutNote").value.trim();
+        document.getElementById(
+            "stockOutNote"
+        ).value.trim();
 
+
+    // ========================================
+    // VALIDATE PRODUCT
+    // ========================================
 
     if (!productId) {
 
-        alert("Please select a product.");
+        alert(
+            "Please select a product."
+        );
 
         return;
 
     }
 
 
+    // ========================================
+    // VALIDATE QUANTITY
+    // ========================================
+
+    const parsedQuantity =
+        Number(quantity);
+
+
     if (
-        !Number.isInteger(Number(quantity)) ||
-        Number(quantity) <= 0
+        quantity === "" ||
+        !Number.isInteger(parsedQuantity) ||
+        parsedQuantity <= 0
     ) {
 
-        alert("Please enter a valid quantity.");
+        alert(
+            "Please enter a valid positive whole number."
+        );
 
         return;
 
@@ -737,50 +968,62 @@ async function submitStockOut(event) {
         const response =
             await authenticatedRequest(
                 "/stock-transactions",
-                {
-                    method: "POST",
+             {
+                method: "POST",
 
-                    body: JSON.stringify({
+                body: JSON.stringify({
+                    product_id: Number(productId),
 
-                        product_id: Number(productId),
+                    transaction_type: "STOCK_OUT",
 
-                        transaction_type: "STOCK_OUT",
+                    quantity: parsedQuantity,
 
-                        quantity: Number(quantity),
-
-                        notes: note || null
-
-                    })
-
-                }
+                    notes: reason
+                        ? `${reason}${note ? " - " + note : ""}`
+                        : (note || null)
+                })
+            }
             );
 
 
         alert(
             response.data.message ||
-            "Stock removed successfully."
+            `Stock Out successful!\n\nQuantity removed: ${parsedQuantity}`
         );
 
 
-        // Close modal
+        // ========================================
+        // CLOSE MODAL
+        // ========================================
+
         const modalElement =
-            document.getElementById("stockOutModal");
+            document.getElementById(
+                "stockOutModal"
+            );
+
 
         const modal =
             bootstrap.Modal.getInstance(
                 modalElement
             );
 
+
         if (modal) {
             modal.hide();
         }
 
 
-        // Reset form
+        // ========================================
+        // RESET FORM
+        // ========================================
+
         form.reset();
 
 
-        // Reload products
+        // ========================================
+        // REFRESH DATA
+        // ========================================
+
         await loadStockProducts();
 
         await loadStockTransactions();
@@ -793,35 +1036,32 @@ async function submitStockOut(event) {
         );
 
 
-        alert(
-            error.message ||
-            "Failed to remove stock."
-        );
+        if (
+            error.message &&
+            error.message
+                .toLowerCase()
+                .includes("insufficient stock")
+        ) {
 
-    }
+            alert(
+                "Insufficient stock. " +
+                "The available stock cannot cover this quantity."
+            );
 
-}
-
-const historyButtons =
-    document.querySelectorAll(
-        ".stock-history-btn"
-    );
-
-historyButtons.forEach((button) => {
-
-    button.addEventListener(
-        "click",
-        () => {
-
-            const productId =
-                button.dataset.productId;
-
-            viewProductStockHistory(productId);
+            return;
 
         }
-    );
 
-});
+
+        alert(
+            error.message ||
+            "Failed to process stock out."
+        );
+
+    } finally {
+        stockOutSubmitting = false;
+    }
+}
 
 // ========================================
 // LOAD STOCK TRANSACTIONS
@@ -836,10 +1076,14 @@ async function loadStockTransactions() {
                 "/stock-transactions"
             );
 
+
         const transactions =
             response.data.data || [];
 
-        displayStockTransactions(transactions);
+
+        displayStockTransactions(
+            transactions
+        );
 
     } catch (error) {
 
@@ -847,6 +1091,7 @@ async function loadStockTransactions() {
             "Load stock transactions error:",
             error
         );
+
 
         if (transactionTableBody) {
 
@@ -878,16 +1123,14 @@ async function loadStockTransactions() {
 // DISPLAY STOCK TRANSACTIONS
 // ========================================
 
-function displayStockTransactions(transactions) {
+function displayStockTransactions(
+    transactions
+) {
 
     if (!transactionTableBody) {
         return;
     }
 
-
-    // ========================================
-    // UPDATE TRANSACTION COUNT
-    // ========================================
 
     if (transactionCount) {
 
@@ -896,10 +1139,6 @@ function displayStockTransactions(transactions) {
 
     }
 
-
-    // ========================================
-    // EMPTY STATE
-    // ========================================
 
     if (transactions.length === 0) {
 
@@ -925,111 +1164,132 @@ function displayStockTransactions(transactions) {
     }
 
 
-    // ========================================
-    // DISPLAY TRANSACTIONS
-    // ========================================
-
     transactionTableBody.innerHTML =
-        transactions.map(
-            (transaction, index) => {
+        transactions
+            .map(
+                (transaction, index) => {
 
-                const isStockIn =
-                    transaction.transaction_type ===
-                    "STOCK_IN";
-
-
-                const typeBadge = isStockIn
-
-                    ? `
-                        <span class="badge text-bg-success">
-                            STOCK IN
-                        </span>
-                      `
-
-                    : `
-                        <span class="badge text-bg-danger">
-                            STOCK OUT
-                        </span>
-                      `;
+                    const isStockIn =
+                        transaction.transaction_type ===
+                        "STOCK_IN";
 
 
-                return `
+                    const typeBadge =
+                        isStockIn
 
-                    <tr>
+                            ? `
+                                <span
+                                    class="badge text-bg-success"
+                                >
+                                    STOCK IN
+                                </span>
+                              `
 
-                        <td>
-                            ${index + 1}
-                        </td>
+                            : `
+                                <span
+                                    class="badge text-bg-danger"
+                                >
+                                    STOCK OUT
+                                </span>
+                              `;
 
-                        <td>
-                            ${escapeHtml(
-                                transaction.product_name || "—"
-                            )}
-                        </td>
 
-                        <td>
-                            ${escapeHtml(
-                                transaction.sku || "—"
-                            )}
-                        </td>
+                    return `
 
-                        <td>
-                            ${typeBadge}
-                        </td>
+                        <tr>
 
-                        <td class="fw-bold">
-                            ${transaction.quantity}
-                        </td>
+                            <td>
+                                ${index + 1}
+                            </td>
 
-                        <td>
-                            ${escapeHtml(
-                                transaction.user_name || "—"
-                            )}
-                        </td>
+                            <td>
+                                ${escapeHtml(
+                                    transaction.product_name ||
+                                    "—"
+                                )}
+                            </td>
 
-                        <td>
-                            ${escapeHtml(
-                                transaction.notes || "—"
-                            )}
-                        </td>
+                            <td>
+                                ${escapeHtml(
+                                    transaction.sku ||
+                                    "—"
+                                )}
+                            </td>
 
-                        <td>
-                            ${transaction.created_at
-                                ? new Date(
+                            <td>
+                                ${typeBadge}
+                            </td>
+
+                            <td class="fw-bold">
+                                ${transaction.quantity}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    transaction.user_name ||
+                                    "—"
+                                )}
+                            </td>
+
+                            <td>
+                                ${escapeHtml(
+                                    transaction.notes ||
+                                    "—"
+                                )}
+                            </td>
+
+                            <td>
+                                ${
                                     transaction.created_at
-                                  ).toLocaleString()
-                                : "—"
-                            }
-                        </td>
+                                        ? new Date(
+                                            transaction.created_at
+                                          ).toLocaleString()
+                                        : "—"
+                                }
+                            </td>
 
-                    </tr>
+                        </tr>
 
-                `;
+                    `;
 
-            }
-        ).join("");
+                }
+            )
+            .join("");
 
 }
+
 
 // ========================================
 // VIEW PRODUCT STOCK HISTORY
 // ========================================
 
-async function viewProductStockHistory(productId) {
+async function viewProductStockHistory(
+    productId
+) {
 
     const modalElement =
-        document.getElementById("stockHistoryModal");
+        document.getElementById(
+            "stockHistoryModal"
+        );
+
 
     const loadingElement =
-        document.getElementById("stockHistoryLoading");
+        document.getElementById(
+            "stockHistoryLoading"
+        );
+
 
     const emptyElement =
-        document.getElementById("stockHistoryEmpty");
+        document.getElementById(
+            "stockHistoryEmpty"
+        );
+
 
     const tableContainer =
         document.getElementById(
             "stockHistoryTableContainer"
         );
+
 
     const tableBody =
         document.getElementById(
@@ -1046,11 +1306,17 @@ async function viewProductStockHistory(productId) {
     // RESET MODAL
     // ========================================
 
-    loadingElement.classList.remove("d-none");
+    loadingElement.classList.remove(
+        "d-none"
+    );
 
-    emptyElement.classList.add("d-none");
+    emptyElement.classList.add(
+        "d-none"
+    );
 
-    tableContainer.classList.add("d-none");
+    tableContainer.classList.add(
+        "d-none"
+    );
 
     tableBody.innerHTML = "";
 
@@ -1064,6 +1330,7 @@ async function viewProductStockHistory(productId) {
             modalElement
         );
 
+
     modal.show();
 
 
@@ -1074,6 +1341,7 @@ async function viewProductStockHistory(productId) {
                 `/stock-transactions/product/${productId}`
             );
 
+
         const transactions =
             response.data.data || [];
 
@@ -1082,7 +1350,9 @@ async function viewProductStockHistory(productId) {
         // HIDE LOADING
         // ========================================
 
-        loadingElement.classList.add("d-none");
+        loadingElement.classList.add(
+            "d-none"
+        );
 
 
         // ========================================
@@ -1091,7 +1361,9 @@ async function viewProductStockHistory(productId) {
 
         if (transactions.length === 0) {
 
-            emptyElement.classList.remove("d-none");
+            emptyElement.classList.remove(
+                "d-none"
+            );
 
             return;
 
@@ -1099,78 +1371,89 @@ async function viewProductStockHistory(productId) {
 
 
         // ========================================
-        // DISPLAY TRANSACTIONS
+        // DISPLAY HISTORY
         // ========================================
 
         tableBody.innerHTML =
-            transactions.map((transaction) => {
+            transactions
+                .map(
+                    transaction => {
 
-                const isStockIn =
-                    transaction.transaction_type ===
-                    "STOCK_IN";
-
-
-                const badge = isStockIn
-
-                    ? `
-                        <span class="badge text-bg-success">
-                            STOCK IN
-                        </span>
-                      `
-
-                    : `
-                        <span class="badge text-bg-danger">
-                            STOCK OUT
-                        </span>
-                      `;
+                        const isStockIn =
+                            transaction.transaction_type ===
+                            "STOCK_IN";
 
 
-                const date =
-                    transaction.created_at
-                        ? new Date(
+                        const badge =
+                            isStockIn
+
+                                ? `
+                                    <span
+                                        class="badge text-bg-success"
+                                    >
+                                        STOCK IN
+                                    </span>
+                                  `
+
+                                : `
+                                    <span
+                                        class="badge text-bg-danger"
+                                    >
+                                        STOCK OUT
+                                    </span>
+                                  `;
+
+
+                        const date =
                             transaction.created_at
-                          ).toLocaleString()
-                        : "—";
+                                ? new Date(
+                                    transaction.created_at
+                                  ).toLocaleString()
+                                : "—";
 
 
-                return `
+                        return `
 
-                    <tr>
+                            <tr>
 
-                        <td>
-                            ${escapeHtml(date)}
-                        </td>
+                                <td>
+                                    ${escapeHtml(date)}
+                                </td>
 
-                        <td>
-                            ${badge}
-                        </td>
+                                <td>
+                                    ${badge}
+                                </td>
 
-                        <td class="fw-bold">
-                            ${transaction.quantity}
-                        </td>
+                                <td class="fw-bold">
+                                    ${transaction.quantity}
+                                </td>
 
-                        <td>
-                            ${escapeHtml(
-                                transaction.user_name ||
-                                "—"
-                            )}
-                        </td>
+                                <td>
+                                    ${escapeHtml(
+                                        transaction.user_name ||
+                                        "—"
+                                    )}
+                                </td>
 
-                        <td>
-                            ${escapeHtml(
-                                transaction.notes ||
-                                "—"
-                            )}
-                        </td>
+                                <td>
+                                    ${escapeHtml(
+                                        transaction.notes ||
+                                        "—"
+                                    )}
+                                </td>
 
-                    </tr>
+                            </tr>
 
-                `;
+                        `;
 
-            }).join("");
+                    }
+                )
+                .join("");
 
 
-        tableContainer.classList.remove("d-none");
+        tableContainer.classList.remove(
+            "d-none"
+        );
 
 
     } catch (error) {
@@ -1181,14 +1464,21 @@ async function viewProductStockHistory(productId) {
         );
 
 
-        loadingElement.classList.add("d-none");
+        loadingElement.classList.add(
+            "d-none"
+        );
 
-        emptyElement.classList.remove("d-none");
+        emptyElement.classList.remove(
+            "d-none"
+        );
+
 
         emptyElement.innerHTML = `
 
-            <i class="bi bi-exclamation-triangle fs-1
-                      d-block mb-2 text-danger"></i>
+            <i
+                class="bi bi-exclamation-triangle
+                       fs-1 d-block mb-2 text-danger"
+            ></i>
 
             <span class="text-danger">
                 Failed to load transaction history.
@@ -1200,6 +1490,7 @@ async function viewProductStockHistory(productId) {
 
 }
 
+
 // ========================================
 // ESCAPE HTML
 // ========================================
@@ -1209,8 +1500,10 @@ function escapeHtml(value) {
     const div =
         document.createElement("div");
 
+
     div.textContent =
         value ?? "";
+
 
     return div.innerHTML;
 
@@ -1218,7 +1511,33 @@ function escapeHtml(value) {
 
 
 // ========================================
-// EVENT LISTENERS
+// UPDATE AVAILABLE STOCK WHEN PRODUCT CHANGES
+// ========================================
+
+const stockOutProduct =
+    document.getElementById(
+        "stockOutProduct"
+    );
+
+
+if (stockOutProduct) {
+
+    stockOutProduct.addEventListener(
+        "change",
+        () => {
+
+            updateAvailableStockDisplay(
+                stockOutProduct.value
+            );
+
+        }
+    );
+
+}
+
+
+// ========================================
+// SEARCH EVENT
 // ========================================
 
 if (stockSearch) {
@@ -1231,6 +1550,10 @@ if (stockSearch) {
 }
 
 
+// ========================================
+// STATUS FILTER EVENT
+// ========================================
+
 if (stockStatusFilter) {
 
     stockStatusFilter.addEventListener(
@@ -1241,6 +1564,10 @@ if (stockStatusFilter) {
 }
 
 
+// ========================================
+// RESET FILTER EVENT
+// ========================================
+
 if (resetStockFilters) {
 
     resetStockFilters.addEventListener(
@@ -1250,15 +1577,21 @@ if (resetStockFilters) {
 
 }
 
+
 // ========================================
 // STOCK FORM LISTENERS
 // ========================================
 
 const stockInForm =
-    document.getElementById("stockInForm");
+    document.getElementById(
+        "stockInForm"
+    );
+
 
 const stockOutForm =
-    document.getElementById("stockOutForm");
+    document.getElementById(
+        "stockOutForm"
+    );
 
 
 if (stockInForm) {
@@ -1290,8 +1623,8 @@ document.addEventListener(
     () => {
 
         loadStockProducts();
+
         loadStockTransactions();
 
     }
 );
-
