@@ -24,6 +24,11 @@ const resetStockFilters =
 const stockCount =
     document.getElementById("stockCount");
 
+    const transactionTableBody =
+    document.getElementById("transactionTableBody");
+
+const transactionCount =
+    document.getElementById("transactionCount");
 
 // ========================================
 // LOAD PRODUCTS
@@ -164,6 +169,14 @@ function displayStockProducts(products) {
                     title="Stock out"
                 >
                     <i class="bi bi-dash-lg"></i>
+                </button>
+
+                <button
+                    class="btn btn-sm btn-outline-primary stock-history-btn"
+                    data-product-id="${product.id}"
+                    title="View stock history"
+                >
+                    <i class="bi bi-clock-history"></i>
                 </button>
 
             </td>
@@ -567,6 +580,627 @@ function openStockOutModal(productId) {
 
 
 // ========================================
+// SUBMIT STOCK IN
+// ========================================
+
+async function submitStockIn(event) {
+
+    event.preventDefault();
+
+    const form = event.target;
+
+    const productId =
+        document.getElementById("stockInProduct").value;
+
+    const quantity =
+        document.getElementById("stockInQuantity").value;
+
+    const note =
+        document.getElementById("stockInNote").value.trim();
+
+
+    if (!productId) {
+
+        alert("Please select a product.");
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isInteger(Number(quantity)) ||
+        Number(quantity) <= 0
+    ) {
+
+        alert("Please enter a valid quantity.");
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await authenticatedRequest(
+                "/stock-transactions",
+                {
+                    method: "POST",
+
+                    body: JSON.stringify({
+
+                        product_id: Number(productId),
+
+                        transaction_type: "STOCK_IN",
+
+                        quantity: Number(quantity),
+
+                        notes: note || null
+
+                    })
+
+                }
+            );
+
+
+        alert(
+            response.data.message ||
+            "Stock added successfully."
+        );
+
+
+        // Close modal
+        const modalElement =
+            document.getElementById("stockInModal");
+
+        const modal =
+            bootstrap.Modal.getInstance(
+                modalElement
+            );
+
+        if (modal) {
+            modal.hide();
+        }
+
+
+        // Reset form
+        form.reset();
+
+
+        // Reload products
+        await loadStockProducts();
+
+        await loadStockTransactions();
+
+    } catch (error) {
+
+        console.error(
+            "Stock In error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Failed to add stock."
+        );
+
+    }
+
+}
+
+
+// ========================================
+// SUBMIT STOCK OUT
+// ========================================
+
+async function submitStockOut(event) {
+
+    event.preventDefault();
+
+    const form = event.target;
+
+    const productId =
+        document.getElementById("stockOutProduct").value;
+
+    const quantity =
+        document.getElementById("stockOutQuantity").value;
+
+    const note =
+        document.getElementById("stockOutNote").value.trim();
+
+
+    if (!productId) {
+
+        alert("Please select a product.");
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isInteger(Number(quantity)) ||
+        Number(quantity) <= 0
+    ) {
+
+        alert("Please enter a valid quantity.");
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await authenticatedRequest(
+                "/stock-transactions",
+                {
+                    method: "POST",
+
+                    body: JSON.stringify({
+
+                        product_id: Number(productId),
+
+                        transaction_type: "STOCK_OUT",
+
+                        quantity: Number(quantity),
+
+                        notes: note || null
+
+                    })
+
+                }
+            );
+
+
+        alert(
+            response.data.message ||
+            "Stock removed successfully."
+        );
+
+
+        // Close modal
+        const modalElement =
+            document.getElementById("stockOutModal");
+
+        const modal =
+            bootstrap.Modal.getInstance(
+                modalElement
+            );
+
+        if (modal) {
+            modal.hide();
+        }
+
+
+        // Reset form
+        form.reset();
+
+
+        // Reload products
+        await loadStockProducts();
+
+        await loadStockTransactions();
+
+    } catch (error) {
+
+        console.error(
+            "Stock Out error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Failed to remove stock."
+        );
+
+    }
+
+}
+
+const historyButtons =
+    document.querySelectorAll(
+        ".stock-history-btn"
+    );
+
+historyButtons.forEach((button) => {
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            const productId =
+                button.dataset.productId;
+
+            viewProductStockHistory(productId);
+
+        }
+    );
+
+});
+
+// ========================================
+// LOAD STOCK TRANSACTIONS
+// ========================================
+
+async function loadStockTransactions() {
+
+    try {
+
+        const response =
+            await authenticatedRequest(
+                "/stock-transactions"
+            );
+
+        const transactions =
+            response.data.data || [];
+
+        displayStockTransactions(transactions);
+
+    } catch (error) {
+
+        console.error(
+            "Load stock transactions error:",
+            error
+        );
+
+        if (transactionTableBody) {
+
+            transactionTableBody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="8"
+                        class="text-center text-danger py-4"
+                    >
+
+                        Failed to load transaction history.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+}
+
+
+// ========================================
+// DISPLAY STOCK TRANSACTIONS
+// ========================================
+
+function displayStockTransactions(transactions) {
+
+    if (!transactionTableBody) {
+        return;
+    }
+
+
+    // ========================================
+    // UPDATE TRANSACTION COUNT
+    // ========================================
+
+    if (transactionCount) {
+
+        transactionCount.textContent =
+            `${transactions.length} Transactions`;
+
+    }
+
+
+    // ========================================
+    // EMPTY STATE
+    // ========================================
+
+    if (transactions.length === 0) {
+
+        transactionTableBody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="8"
+                    class="text-center text-muted py-4"
+                >
+
+                    No stock transactions found.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    // ========================================
+    // DISPLAY TRANSACTIONS
+    // ========================================
+
+    transactionTableBody.innerHTML =
+        transactions.map(
+            (transaction, index) => {
+
+                const isStockIn =
+                    transaction.transaction_type ===
+                    "STOCK_IN";
+
+
+                const typeBadge = isStockIn
+
+                    ? `
+                        <span class="badge text-bg-success">
+                            STOCK IN
+                        </span>
+                      `
+
+                    : `
+                        <span class="badge text-bg-danger">
+                            STOCK OUT
+                        </span>
+                      `;
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            ${index + 1}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                transaction.product_name || "—"
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                transaction.sku || "—"
+                            )}
+                        </td>
+
+                        <td>
+                            ${typeBadge}
+                        </td>
+
+                        <td class="fw-bold">
+                            ${transaction.quantity}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                transaction.user_name || "—"
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                transaction.notes || "—"
+                            )}
+                        </td>
+
+                        <td>
+                            ${transaction.created_at
+                                ? new Date(
+                                    transaction.created_at
+                                  ).toLocaleString()
+                                : "—"
+                            }
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        ).join("");
+
+}
+
+// ========================================
+// VIEW PRODUCT STOCK HISTORY
+// ========================================
+
+async function viewProductStockHistory(productId) {
+
+    const modalElement =
+        document.getElementById("stockHistoryModal");
+
+    const loadingElement =
+        document.getElementById("stockHistoryLoading");
+
+    const emptyElement =
+        document.getElementById("stockHistoryEmpty");
+
+    const tableContainer =
+        document.getElementById(
+            "stockHistoryTableContainer"
+        );
+
+    const tableBody =
+        document.getElementById(
+            "stockHistoryTableBody"
+        );
+
+
+    if (!modalElement) {
+        return;
+    }
+
+
+    // ========================================
+    // RESET MODAL
+    // ========================================
+
+    loadingElement.classList.remove("d-none");
+
+    emptyElement.classList.add("d-none");
+
+    tableContainer.classList.add("d-none");
+
+    tableBody.innerHTML = "";
+
+
+    // ========================================
+    // SHOW MODAL
+    // ========================================
+
+    const modal =
+        bootstrap.Modal.getOrCreateInstance(
+            modalElement
+        );
+
+    modal.show();
+
+
+    try {
+
+        const response =
+            await authenticatedRequest(
+                `/stock-transactions/product/${productId}`
+            );
+
+        const transactions =
+            response.data.data || [];
+
+
+        // ========================================
+        // HIDE LOADING
+        // ========================================
+
+        loadingElement.classList.add("d-none");
+
+
+        // ========================================
+        // EMPTY STATE
+        // ========================================
+
+        if (transactions.length === 0) {
+
+            emptyElement.classList.remove("d-none");
+
+            return;
+
+        }
+
+
+        // ========================================
+        // DISPLAY TRANSACTIONS
+        // ========================================
+
+        tableBody.innerHTML =
+            transactions.map((transaction) => {
+
+                const isStockIn =
+                    transaction.transaction_type ===
+                    "STOCK_IN";
+
+
+                const badge = isStockIn
+
+                    ? `
+                        <span class="badge text-bg-success">
+                            STOCK IN
+                        </span>
+                      `
+
+                    : `
+                        <span class="badge text-bg-danger">
+                            STOCK OUT
+                        </span>
+                      `;
+
+
+                const date =
+                    transaction.created_at
+                        ? new Date(
+                            transaction.created_at
+                          ).toLocaleString()
+                        : "—";
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+                            ${escapeHtml(date)}
+                        </td>
+
+                        <td>
+                            ${badge}
+                        </td>
+
+                        <td class="fw-bold">
+                            ${transaction.quantity}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                transaction.user_name ||
+                                "—"
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                transaction.notes ||
+                                "—"
+                            )}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }).join("");
+
+
+        tableContainer.classList.remove("d-none");
+
+
+    } catch (error) {
+
+        console.error(
+            "Product stock history error:",
+            error
+        );
+
+
+        loadingElement.classList.add("d-none");
+
+        emptyElement.classList.remove("d-none");
+
+        emptyElement.innerHTML = `
+
+            <i class="bi bi-exclamation-triangle fs-1
+                      d-block mb-2 text-danger"></i>
+
+            <span class="text-danger">
+                Failed to load transaction history.
+            </span>
+
+        `;
+
+    }
+
+}
+
+// ========================================
 // ESCAPE HTML
 // ========================================
 
@@ -616,6 +1250,36 @@ if (resetStockFilters) {
 
 }
 
+// ========================================
+// STOCK FORM LISTENERS
+// ========================================
+
+const stockInForm =
+    document.getElementById("stockInForm");
+
+const stockOutForm =
+    document.getElementById("stockOutForm");
+
+
+if (stockInForm) {
+
+    stockInForm.addEventListener(
+        "submit",
+        submitStockIn
+    );
+
+}
+
+
+if (stockOutForm) {
+
+    stockOutForm.addEventListener(
+        "submit",
+        submitStockOut
+    );
+
+}
+
 
 // ========================================
 // INITIALIZE STOCK PAGE
@@ -626,6 +1290,7 @@ document.addEventListener(
     () => {
 
         loadStockProducts();
+        loadStockTransactions();
 
     }
 );

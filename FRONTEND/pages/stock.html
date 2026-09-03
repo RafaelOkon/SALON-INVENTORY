@@ -930,6 +930,201 @@
 
         </div>
 
+
+                <!-- =========================
+             STOCK TRANSACTION HISTORY
+        ========================== -->
+
+        <div class="card border-0 shadow-sm mt-4">
+
+            <div class="card-header bg-white py-3">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <h5 class="fw-bold mb-0">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Stock Transaction History
+                    </h5>
+
+                    <span
+                        class="badge text-bg-secondary"
+                        id="transactionCount"
+                    >
+                        0 Transactions
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table
+                        class="table table-hover align-middle mb-0"
+                        id="transactionTable"
+                    >
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th>#</th>
+
+                                <th>Product</th>
+
+                                <th>SKU</th>
+
+                                <th>Type</th>
+
+                                <th>Quantity</th>
+
+                                <th>User</th>
+
+                                <th>Note</th>
+
+                                <th>Date</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="transactionTableBody">
+
+                            <tr>
+
+                                <td
+                                    colspan="8"
+                                    class="text-center text-muted py-4"
+                                >
+                                    Loading transaction history...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+<!-- =========================
+     PRODUCT STOCK HISTORY MODAL
+========================== -->
+
+<div
+    class="modal fade"
+    id="stockHistoryModal"
+    tabindex="-1"
+    aria-labelledby="stockHistoryModalLabel"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title fw-bold"
+                    id="stockHistoryModalLabel"
+                >
+                    <i class="bi bi-clock-history me-2"></i>
+                    Stock Transaction History
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div
+                    id="stockHistoryLoading"
+                    class="text-center text-muted py-4"
+                >
+                    Loading transaction history...
+                </div>
+
+
+                <div
+                    id="stockHistoryEmpty"
+                    class="text-center text-muted py-4 d-none"
+                >
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    No stock transactions found.
+                </div>
+
+
+                <div
+                    class="table-responsive d-none"
+                    id="stockHistoryTableContainer"
+                >
+
+                    <table
+                        class="table table-hover align-middle"
+                    >
+
+                        <thead class="table-light">
+
+                            <tr>
+
+                                <th>Date</th>
+
+                                <th>Type</th>
+
+                                <th>Quantity</th>
+
+                                <th>User</th>
+
+                                <th>Note</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="stockHistoryTableBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
     </main>
 
 
