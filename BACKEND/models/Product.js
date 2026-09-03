@@ -375,6 +375,40 @@ const searchProducts = async (filters) => {
 
 
 // ========================================
+// UPDATE PRODUCT STOCK QUANTITY
+// ========================================
+
+const updateProductStock = async (
+    productId,
+    newQuantity
+) => {
+
+    const [result] = await pool.query(
+
+        `
+        UPDATE products
+
+        SET
+            quantity = ?,
+            updated_at = CURRENT_TIMESTAMP
+
+        WHERE id = ?
+        `,
+
+        [
+            newQuantity,
+            productId
+        ]
+
+    );
+
+
+    return result.affectedRows;
+
+};
+
+
+// ========================================
 // EXPORT FUNCTIONS
 // ========================================
 
@@ -390,6 +424,8 @@ module.exports = {
 
     deleteProduct,
 
-    searchProducts
+    searchProducts,
+
+    updateProductStock
 
 };

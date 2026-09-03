@@ -1,9 +1,9 @@
 const express = require("express");
 
-const protect =
-    require("../middleware/authMiddleware");
+const protect = require("../middleware/authMiddleware");
 
 const {
+    createStockTransactionController,
     getStockTransactionsController,
     getProductStockHistoryController
 } = require("../controllers/stockTransactionController");
@@ -13,8 +13,18 @@ const router = express.Router();
 
 
 // ========================================
-// GET ALL STOCK HISTORY
-// GET /api/stock-transactions
+// CREATE STOCK TRANSACTION
+// ========================================
+
+router.post(
+    "/",
+    protect,
+    createStockTransactionController
+);
+
+
+// ========================================
+// GET ALL STOCK TRANSACTIONS
 // ========================================
 
 router.get(
@@ -26,7 +36,6 @@ router.get(
 
 // ========================================
 // GET PRODUCT STOCK HISTORY
-// GET /api/stock-transactions/product/:productId
 // ========================================
 
 router.get(
