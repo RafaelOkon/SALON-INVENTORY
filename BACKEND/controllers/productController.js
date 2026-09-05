@@ -28,47 +28,101 @@ const createProductController = async (req, res) => {
         } = req.body;
 
 
-        // Validate required fields
+// ========================================
+// VALIDATE PRODUCT DATA
+// ========================================
 
-        if (
-            !name ||
-            !sku ||
-            !categoryId ||
-            price === undefined ||
-            quantity === undefined ||
-            minimumStockLevel === undefined
-        ) {
+if (!name || name.trim() === "") {
 
-            return res.status(400).json({
+    return res.status(400).json({
+        success: false,
+        message: "Product name is required"
+    });
 
-                success: false,
+}
 
-                message:
-                    "Name, SKU, category, price, quantity and minimum stock level are required"
+if (!sku || sku.trim() === "") {
 
-            });
+    return res.status(400).json({
+        success: false,
+        message: "SKU is required"
+    });
 
-        }
+}
 
+if (
+    !Number.isInteger(Number(categoryId)) ||
+    Number(categoryId) <= 0
+) {
 
-        // Validate numeric values
+    return res.status(400).json({
+        success: false,
+        message: "Valid category ID is required"
+    });
 
-        if (
-            Number(price) < 0 ||
-            Number(quantity) < 0 ||
-            Number(minimumStockLevel) < 0
-        ) {
+}
 
-            return res.status(400).json({
+if (
+    supplierId !== undefined &&
+    supplierId !== null &&
+    supplierId !== "" &&
+    (
+        !Number.isInteger(Number(supplierId)) ||
+        Number(supplierId) <= 0
+    )
+) {
 
-                success: false,
+    return res.status(400).json({
+        success: false,
+        message: "Invalid supplier ID"
+    });
 
-                message:
-                    "Price, quantity and minimum stock level cannot be negative"
+}
 
-            });
+if (
+    price === undefined ||
+    price === null ||
+    price === "" ||
+    !Number.isFinite(Number(price)) ||
+    Number(price) < 0
+) {
 
-        }
+    return res.status(400).json({
+        success: false,
+        message: "Price must be a valid non-negative number"
+    });
+
+}
+
+if (
+    quantity === undefined ||
+    quantity === null ||
+    quantity === "" ||
+    !Number.isInteger(Number(quantity)) ||
+    Number(quantity) < 0
+) {
+
+    return res.status(400).json({
+        success: false,
+        message: "Quantity must be a valid non-negative integer"
+    });
+
+}
+
+if (
+    minimumStockLevel === undefined ||
+    minimumStockLevel === null ||
+    minimumStockLevel === "" ||
+    !Number.isInteger(Number(minimumStockLevel)) ||
+    Number(minimumStockLevel) < 0
+) {
+
+    return res.status(400).json({
+        success: false,
+        message: "Minimum stock level must be a valid non-negative integer"
+    });
+
+}
 
 
         const productId =
@@ -219,7 +273,10 @@ const getProductController = async (req, res) => {
 
         // Validate ID
 
-        if (!Number.isInteger(Number(id))) {
+        if (
+            !Number.isInteger(Number(id)) ||
+            Number(id) <= 0
+        ) {
 
             return res.status(400).json({
 
@@ -294,7 +351,10 @@ const updateProductController = async (req, res) => {
 
         // Validate ID
 
-        if (!Number.isInteger(Number(id))) {
+        if (
+            !Number.isInteger(Number(id)) ||
+            Number(id) <= 0
+        ) {
 
             return res.status(400).json({
 
@@ -320,47 +380,101 @@ const updateProductController = async (req, res) => {
         } = req.body;
 
 
-        // Validate required fields
+// ========================================
+// VALIDATE PRODUCT DATA
+// ========================================
 
-        if (
-            !name ||
-            !sku ||
-            !categoryId ||
-            price === undefined ||
-            quantity === undefined ||
-            minimumStockLevel === undefined
-        ) {
+if (!name || name.trim() === "") {
 
-            return res.status(400).json({
+    return res.status(400).json({
+        success: false,
+        message: "Product name is required"
+    });
 
-                success: false,
+}
 
-                message:
-                    "Name, SKU, category, price, quantity and minimum stock level are required"
+if (!sku || sku.trim() === "") {
 
-            });
+    return res.status(400).json({
+        success: false,
+        message: "SKU is required"
+    });
 
-        }
+}
 
+if (
+    !Number.isInteger(Number(categoryId)) ||
+    Number(categoryId) <= 0
+) {
 
-        // Validate numeric values
+    return res.status(400).json({
+        success: false,
+        message: "Valid category ID is required"
+    });
 
-        if (
-            Number(price) < 0 ||
-            Number(quantity) < 0 ||
-            Number(minimumStockLevel) < 0
-        ) {
+}
 
-            return res.status(400).json({
+if (
+    supplierId !== undefined &&
+    supplierId !== null &&
+    supplierId !== "" &&
+    (
+        !Number.isInteger(Number(supplierId)) ||
+        Number(supplierId) <= 0
+    )
+) {
 
-                success: false,
+    return res.status(400).json({
+        success: false,
+        message: "Invalid supplier ID"
+    });
 
-                message:
-                    "Price, quantity and minimum stock level cannot be negative"
+}
 
-            });
+if (
+    price === undefined ||
+    price === null ||
+    price === "" ||
+    !Number.isFinite(Number(price)) ||
+    Number(price) < 0
+) {
 
-        }
+    return res.status(400).json({
+        success: false,
+        message: "Price must be a valid non-negative number"
+    });
+
+}
+
+if (
+    quantity === undefined ||
+    quantity === null ||
+    quantity === "" ||
+    !Number.isInteger(Number(quantity)) ||
+    Number(quantity) < 0
+) {
+
+    return res.status(400).json({
+        success: false,
+        message: "Quantity must be a valid non-negative integer"
+    });
+
+}
+
+if (
+    minimumStockLevel === undefined ||
+    minimumStockLevel === null ||
+    minimumStockLevel === "" ||
+    !Number.isInteger(Number(minimumStockLevel)) ||
+    Number(minimumStockLevel) < 0
+) {
+
+    return res.status(400).json({
+        success: false,
+        message: "Minimum stock level must be a valid non-negative integer"
+    });
+
+}
 
 
         // Check if product exists
@@ -499,7 +613,10 @@ const deleteProductController = async (req, res) => {
 
         // Validate ID
 
-        if (!Number.isInteger(Number(id))) {
+        if (
+            !Number.isInteger(Number(id)) ||
+            Number(id) <= 0
+        ) {
 
             return res.status(400).json({
 

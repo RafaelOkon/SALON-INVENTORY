@@ -1480,6 +1480,7 @@ async function handleAddProduct(event) {
     if (
         !price ||
         price.value === "" ||
+        !Number.isFinite(Number(price.value)) ||
         Number(price.value) < 0
     ) {
 
@@ -1495,6 +1496,7 @@ async function handleAddProduct(event) {
     if (
         !quantity ||
         quantity.value === "" ||
+        !Number.isInteger(Number(quantity.value)) ||
         Number(quantity.value) < 0
     ) {
 
@@ -1510,6 +1512,7 @@ async function handleAddProduct(event) {
     if (
         !minimumStockLevel ||
         minimumStockLevel.value === "" ||
+        !Number.isInteger(Number(minimumStockLevel.value)) ||
         Number(minimumStockLevel.value) < 0
     ) {
 

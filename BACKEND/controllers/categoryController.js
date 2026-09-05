@@ -177,11 +177,10 @@ const getCategoryController = async (
 
         // Validate ID
 
-        if (
-            !Number.isInteger(
-                Number(id)
-            )
-        ) {
+                    if (
+                !Number.isInteger(Number(id)) ||
+                Number(id) <= 0
+                ) {
 
             return res.status(400).json({
 
@@ -261,11 +260,10 @@ const updateCategoryController = async (
 
         // Validate ID
 
-        if (
-            !Number.isInteger(
-                Number(id)
-            )
-        ) {
+            if (
+            !Number.isInteger(Number(id)) ||
+            Number(id) <= 0
+          ) {
 
             return res.status(400).json({
 
@@ -418,10 +416,9 @@ const deleteCategoryController = async (
 
         // Validate ID
 
-        if (
-            !Number.isInteger(
-                Number(id)
-            )
+            if (
+            !Number.isInteger(Number(id)) ||
+            Number(id) <= 0
         ) {
 
             return res.status(400).json({

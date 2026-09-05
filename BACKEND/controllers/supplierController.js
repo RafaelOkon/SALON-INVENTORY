@@ -213,11 +213,10 @@ const getSupplierController = async (
 
         // Validate ID
 
-        if (
-            !Number.isInteger(
-                Number(id)
-            )
-        ) {
+                if (
+                !Number.isInteger(Number(id)) ||
+                Number(id) <= 0
+            ) {
 
             return res.status(400).json({
 
@@ -295,11 +294,10 @@ const updateSupplierController = async (
 
         // Validate ID
 
-        if (
-            !Number.isInteger(
-                Number(id)
-            )
-        ) {
+            if (
+            !Number.isInteger(Number(id)) ||
+            Number(id) <= 0
+            ) {
 
             return res.status(400).json({
 
@@ -347,8 +345,7 @@ const updateSupplierController = async (
 
         if (
             supplierEmail &&
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                .test(supplierEmail)
+            ! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supplierEmail)
         ) {
 
             return res.status(400).json({
@@ -486,10 +483,9 @@ const deleteSupplierController = async (
 
         // Validate ID
 
-        if (
-            !Number.isInteger(
-                Number(id)
-            )
+            if (
+        !Number.isInteger(Number(id)) ||
+        Number(id) <= 0
         ) {
 
             return res.status(400).json({
