@@ -1,3 +1,4 @@
+let stockOverviewChart = null;
 // ========================================
 // DASHBOARD ELEMENTS
 // ========================================
@@ -380,6 +381,71 @@ const displayRecentTransactions = (
         ).join("");
 
 };
+// ========================================
+// DISPLAY STOCK OVERVIEW CHART
+// ========================================
+
+const displayStockOverviewChart = (summary) => {
+
+    const chartElement =
+        document.getElementById("stockOverviewChart");
+
+    if (!chartElement) {
+        console.error(
+            "Element #stockOverviewChart was not found."
+        );
+        return;
+    }
+
+    // Destroy previous chart before creating a new one
+    if (stockOverviewChart) {
+        stockOverviewChart.destroy();
+        stockOverviewChart = null;
+    }
+
+    stockOverviewChart = new Chart(chartElement, {
+
+        type: "bar",
+
+        data: {
+            labels: [
+                "Total Stock",
+                "Low Stock",
+                "Out of Stock"
+            ],
+
+            datasets: [{
+                label: "Stock Overview",
+
+                data: [
+                    Number(summary.totalStock) || 0,
+                    Number(summary.lowStockProducts) || 0,
+                    Number(summary.outOfStockProducts) || 0
+                ]
+            }]
+        },
+
+        options: {
+            responsive: true,
+
+            maintainAspectRatio: true,
+
+            aspectRatio: 4,
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+};
 
 
 // ========================================
@@ -572,6 +638,39 @@ const loadDashboard = async () => {
             recentTransactions
         );
 
+        //=========================================
+        // DISPLAY OVERVIEW CHARTS
+        //=========================================
+
+        displayStockOverviewChart(
+            summary
+        );
+
+// ========================================
+// LOW STOCK ALERT
+// ========================================
+
+const lowStockAlert =
+    document.getElementById("lowStockAlert");
+
+const lowStockAlertMessage =
+    document.getElementById("lowStockAlertMessage");
+
+if (lowStockAlert && lowStockAlertMessage) {
+
+    if (lowStockItems.length > 0) {
+
+        lowStockAlertMessage.textContent =
+            ` ${lowStockItems.length} product(s) are currently low in stock.`;
+
+        lowStockAlert.classList.remove("d-none");
+
+    } else {
+
+        lowStockAlert.classList.add("d-none");
+
+    }
+}
 
         // ========================================
         // SUCCESS MESSAGE
@@ -604,3 +703,4 @@ const loadDashboard = async () => {
 
 loadDashboard();
 displayLowStockProducts([]);
+
